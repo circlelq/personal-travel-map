@@ -1,0 +1,17 @@
+<view class="circle">
+  <input class='search' auto-focus placeholder="请输入组织名称" bindconfirm="bindconfirmT" bindinput="bindKeyInput" placeholder-class="placeholder" />
+</view>
+
+<view class="container">
+  <view class="divLineLong"></view>
+</view>
+
+<navigator block wx:for="{{organization}}" wx:key="_id" url="/pages/organizationDetail/organizationDetail?organization_id={{item._id}}">
+  <view data-organization_id='{{item._id}}'>
+    <view class="catitem">
+      <image class='avator' lazy-load='true' src="https://assemble-1257850266.cos.ap-nanjing.myqcloud.com/%E4%BC%9A%E5%BE%BD/{{item.name}}.png" mode='aspectFill'></image>
+      <view class="cat-name">{{item.name}}</view>
+    </view>
+    <view class="divLine"></view>
+  </view>
+</navigator>

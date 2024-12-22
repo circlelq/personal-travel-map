@@ -1,0 +1,37 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/search/search",
+    "pages/about/about",
+    "pages/organizationDetail/organizationDetail",
+    "pages/map/map"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": " circle 的旅行地图",
+    "navigationBarTextStyle": "black"
+  },
+  "sitemapLocation": "sitemap.json",
+  "tabBar": {
+    "selectedColor": "#557e56",
+    "color": "#888888",
+    "list": [{
+        "text": "时间",
+        "pagePath": "pages/index/index"
+      },
+      {
+        "text": "地点",
+        "pagePath": "pages/map/map"
+      },
+      {
+        "text": "关于",
+        "pagePath": "pages/about/about"
+      }
+    ]
+  },
+  "lazyCodeLoading": "requiredComponents",
+  "useExtendedLib": {
+    "weui": true
+  }
+}

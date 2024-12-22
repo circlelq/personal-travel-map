@@ -1,0 +1,10 @@
+/* pages/about/about.wxss */
+
+.logo {
+  font-size: 30rpx;
+  position: relative;
+  bottom: 20rpx;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}

@@ -1,0 +1,15 @@
+page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+
+.back {
+  font-size: 40rpx;
+  position: absolute;
+  bottom: 20rpx;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
