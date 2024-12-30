@@ -2,7 +2,7 @@ const app = getApp();
 
 Page({
   data: {
-    organization: [],
+    city: [],
     inputValue: "NaN",
   },
 
@@ -12,15 +12,15 @@ Page({
   onLoad: function (options) {
     if (options.pageId) {
       wx.navigateTo({
-        url: '/pages/organization/' + options.pageId + '/' + options.pageId,
+        url: '/pages/city/' + options.pageId + '/' + options.pageId,
       })
     }
-    this.loadMoreOrganization();
+    this.loadMoreCity();
   },
 
-  loadMoreOrganization() {
-    const organization = this.data.organization;
-    app.mpServerless.db.collection('organization').find({
+  loadMoreCity() {
+    const city = this.data.city;
+    app.mpServerless.db.collection('city').find({
       name: {
         $regex: this.data.inputValue
       }
@@ -28,14 +28,14 @@ Page({
       sort: {
         pinyin: 1
       },
-      // skip: organization.length,
+      // skip: city.length,
       // limit: 20,
     }).then(res => {
       const {
         result: data
       } = res;
       this.setData({
-        organization: data
+        city: data
       });
     }).catch(console.error);
   },
@@ -44,31 +44,31 @@ Page({
    * 页面上拉触底事件的处理函数
    */
   onReachBottom: function () {
-    this.loadMoreOrganization();
+    this.loadMoreCity();
   },
 
   bindKeyInput: function (e) {
     if (e.detail.value == "") {
       this.setData({
-        organization: []
+        city: []
       })
     } else {
       this.setData({
         inputValue: "(?i)" + "(.*)(" + e.detail.value.split('').join(')(.*)(') + ")(.*)"
       })
-      this.loadMoreOrganization();
+      this.loadMoreCity();
     }
   },
 
   // 搜索栏输入名字后页面跳转
   bindconfirmT: function (e) {
     if (e.detail.value) {
-      const organization = this.data.organization;
-      app.mpServerless.db.collection('organization').find({
+      const city = this.data.city;
+      app.mpServerless.db.collection('city').find({
         name: e.detail.value
       }, {}).then(res => {
         wx.navigateTo({
-          url: '/pages/organizationDetail/organizationDetail?organization_id=' + res.result[0]._id,
+          url: '/pages/cityDetail/cityDetail?city_id=' + res.result[0]._id,
         })
       }).catch(console.error);
     }

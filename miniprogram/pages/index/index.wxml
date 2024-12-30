@@ -9,10 +9,10 @@
   <view class="divLineLong"></view>
 </view>
 
-<navigator block wx:for="{{organization}}" wx:key="_id" url="/pages/organizationDetail/organizationDetail?organization_id={{item._id}}">
-  <view bindtap="clickOrganization" data-organization_id='{{item._id}}'>
+<navigator block wx:for="{{city}}" wx:key="_id" url="/pages/cityDetail/cityDetail?city_id={{item._id}}">
+  <view bindtap="clickOrganization" data-city_id='{{item._id}}'>
     <view class="catitem">
-      <image class='avator' lazy-load='true' src="https://assemble-1257850266.cos.ap-nanjing.myqcloud.com/%E4%BC%9A%E5%BE%BD/{{item.name}}.png" mode='aspectFill'></image>
+      <image class='avator' lazy-load='true' src="https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E5%A4%B4%E5%83%8F/{{item.name}}.png" mode='aspectFill'></image>
       <view class="cat-name">{{item.name}}</view>
     </view>
     <view class="divLine"></view>

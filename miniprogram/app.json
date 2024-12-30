@@ -3,7 +3,7 @@
     "pages/index/index",
     "pages/search/search",
     "pages/about/about",
-    "pages/organizationDetail/organizationDetail",
+    "pages/cityDetail/cityDetail",
     "pages/map/map"
   ],
   "window": {
@@ -17,11 +17,11 @@
     "selectedColor": "#557e56",
     "color": "#888888",
     "list": [{
-        "text": "时间",
+        "text": "城市",
         "pagePath": "pages/index/index"
       },
       {
-        "text": "地点",
+        "text": "地图",
         "pagePath": "pages/map/map"
       },
       {

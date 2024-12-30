@@ -1,0 +1,28 @@
+{
+  "name": "嘉应学院关爱流浪猫野生协会",
+  "markers": {
+    "0": {
+      "coordinates": [
+        116.128395,
+        24.328579
+      ],
+      "type": "Point"
+    }
+  },
+  "officialAccount": {
+    "miniprogram": "wx7bab058d1060cf56",
+    // "path": "pkg_Atlas/pages/catlist?societyid=180",
+    "wechat":"嘉大TNR小分队",
+    // "douyin":"CQGCZY小猫之家",
+    // "shu":"TNR咪咪子"
+  },
+  "mainContent": [
+    [
+      "body",
+      "嘉应学院关爱流浪猫野生协会（又名“嘉大TNR小分队”）是由嘉应学院江北校区校本部的学生自发组织的爱护流浪猫志愿组织。主要从事嘉大流浪猫TNR绝育行动、嘉大流浪猫救助与领养等活动。"],
+  [
+      "body",
+      "本协会秉持的宗旨是：通过科学、人道的方式（TNR、领养等）来控制校园流浪猫的数量，改善校园流浪猫的生活质量和健康状态，提升校园社区对动物保护的意识，实现人猫和谐共处，共建美好生态校园环境。"]
+  ],
+  "pinyin": "jyxygallmysxh"
+}

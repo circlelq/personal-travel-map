@@ -5,7 +5,7 @@ Page({
 
   data: {
     markers: [],
-    allOrganization: {}
+    allCity: {}
   },
   regionchange(e) {
     console.log(e.type)
@@ -16,7 +16,7 @@ Page({
     for (let i = 0; i < markers.length; i++) {
       if (event.markerId === markers[i].id) {
         wx.navigateTo({
-          url: '/pages/organizationDetail/organizationDetail' + '?organization_id=' + markers[i].organization_id,
+          url: '/pages/cityDetail/cityDetail' + '?city_id=' + markers[i].city_id,
           success: (result) => {
             console.log("成功跳转");
           },
@@ -31,25 +31,25 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: async function (options) {
-    app.mpServerless.db.collection('organization').find({}, {}).then(res => {
+    app.mpServerless.db.collection('city').find({}, {}).then(res => {
       const {
-        result: allOrganization
+        result: allCity
       } = res;
       this.setData({
-        allOrganization: allOrganization
+        allCity: allCity
       });
     }).then(res => {
       var number = 0
-      for (var organizationNum in this.data.allOrganization) {
-        for (var i in this.data.allOrganization[organizationNum].markers) {
+      for (var cityNum in this.data.allCity) {
+        for (var i in this.data.allCity[cityNum].markers) {
           var marker = [{
-            iconPath: "https://assemble-1257850266.cos.ap-nanjing.myqcloud.com/%E4%BC%9A%E5%BE%BD/" + encodeURIComponent(this.data.allOrganization[organizationNum].name) + ".png",
-            latitude: this.data.allOrganization[organizationNum].markers[i].coordinates[1],
-            longitude: this.data.allOrganization[organizationNum].markers[i].coordinates[0],
+            iconPath: "https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E5%A4%B4%E5%83%8F/" + encodeURIComponent(this.data.allCity[cityNum].name) + ".png",
+            latitude: this.data.allCity[cityNum].markers[i].coordinates[0],
+            longitude: this.data.allCity[cityNum].markers[i].coordinates[1],
             joinCluster: true,
             width: 50,
             height: 50,
-            organization_id: this.data.allOrganization[organizationNum]._id,
+            city_id: this.data.allCity[cityNum]._id,
             id: number,
           }]
           this.setData({
