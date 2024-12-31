@@ -17,10 +17,14 @@
   </view>
 </view>
 
+
 <block wx:for="{{city.photo}}">
   <view style="display:flex; justify-content:center; align-items:center;">
     <image bindtap='previewImage' data-src="https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E5%8E%9F%E5%9B%BE/{{city.name}}/{{item[0]}}.jpg" mode="widthFix" src="https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E9%A2%84%E8%A7%88%E5%9B%BE/{{city.name}}/{{item[0]}}.jpg" style="width: 90%;">
     </image>
+  </view>
+  <view class="legend">
+    {{item[1]}} {{item[2]}}
   </view>
   <text> \n </text>
   <!-- <text user-select="true">{{item[0]}}</text> -->
