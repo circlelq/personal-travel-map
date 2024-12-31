@@ -6,6 +6,7 @@ Page({
     city: {},
     markers: [],
     photoscr: "",
+    photoscrOriginal: "",
   },
 
   /**
@@ -18,7 +19,8 @@ Page({
     }, {}).then(res => {
       this.setData({
         city: res.result[0],
-        photoscr: "https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E9%A2%84%E8%A7%88%E5%9B%BE/" + res.result[0].name + "/" + res.result[0].name + ".jpg"
+        photoscr: "https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E9%A2%84%E8%A7%88%E5%9B%BE/" + res.result[0].name + "/" + res.result[0].name + ".jpg",
+        photoscrOriginal: "https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E5%8E%9F%E5%9B%BE/" + res.result[0].name + "/" + res.result[0].name + ".jpg"
       });
     }).then(res => {
       var number = 0
@@ -37,6 +39,15 @@ Page({
         number++
       }
     });
+  },
+
+  previewImage: function (e) {
+    let that = this;
+    let src = e.currentTarget.dataset.src;
+    wx.previewImage({
+      current: src,
+      urls: [src]
+    })
   },
 
   includePointsOne() {

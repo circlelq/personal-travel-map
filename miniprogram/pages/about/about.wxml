@@ -1,2 +1,6 @@
 <view class="head1">小程序介绍</view>
 
+<view class="weui-footer" display="flex">
+  <view class="weui-footer__text" align-self="flex-end">v1.0.2</view>
+</view>
+<text> \n </text>
