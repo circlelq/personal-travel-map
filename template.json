@@ -1,9 +1,9 @@
 {
-  "name": "香港",
+  "name": "悉尼",
   "markers": {
     "0": {
       "coordinates": [
-        22.291142,114.175948
+        -33.858611, 151.214167
       ],
       "type": "Point"
     }
@@ -13,18 +13,18 @@
     "xhs": {
       "xsecToken": "ABnGaYYM_GDJKVJydlwQ51qaIZV1ipNjB3gnVurQWs6lo",
       "id": "67667d5a000000000b017a33"
-    },
+    }
   },
-  "pinyin": "2024-12-25",
+  "pinyin": "2025-07-16",
   "photo": [
     [
-      "维港1"
+      "悉尼歌剧院1"
     ],
     [
-      "音乐厅"
+      "悉尼歌剧院2"
     ],
     [
-      "香港故宫"
+      "悉尼歌剧院3"
     ]
   ]
 }

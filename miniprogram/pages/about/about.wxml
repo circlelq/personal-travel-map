@@ -1,4 +1,12 @@
 <view class="head1">小程序介绍</view>
+<view class="body">
+  记录去过的城市：在地图上点亮足迹，配上照片和游记链接。
+</view>
+
+<view class="head1">联系我</view>
+<view class="body">
+  邮箱：<text class="copy" bindtap="copy1">yuanlq@pku.edu.cn</text>（点击复制）
+</view>
 
 <view class="weui-footer" display="flex">
   <view class="weui-footer__text" align-self="flex-end">v1.0.3</view>

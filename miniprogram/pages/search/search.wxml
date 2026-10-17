@@ -1,5 +1,5 @@
 <view class="circle">
-  <input class='search' auto-focus placeholder="请输入组织名称" bindconfirm="bindconfirmT" bindinput="bindKeyInput" placeholder-class="placeholder" />
+  <input class='search' auto-focus placeholder="请输入城市名称" bindconfirm="bindconfirmT" bindinput="bindKeyInput" placeholder-class="placeholder" />
 </view>
 
 <view class="container">
@@ -7,9 +7,9 @@
 </view>
 
 <navigator block wx:for="{{city}}" wx:key="_id" url="/pages/cityDetail/cityDetail?city_id={{item._id}}">
-  <view data-city_id='{{item._id}}'>
+  <view>
     <view class="catitem">
-      <image class='avator' lazy-load='true' src="https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E5%A4%B4%E5%83%8F/{{item.name}}.png" mode='aspectFill'></image>
+      <image class='avator' lazy-load='true' src="{{item.avatar}}" mode='aspectFill'></image>
       <view class="cat-name">{{item.name}}</view>
     </view>
     <view class="divLine"></view>

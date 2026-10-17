@@ -1,5 +1,8 @@
 const app = getApp();
 
+// COS 头像目录，城市名需要 URL 编码后拼接
+const COS_AVATAR = 'https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E5%A4%B4%E5%83%8F/';
+
 Page({
   data: {
     city: [],
@@ -11,13 +14,13 @@ Page({
   onLoad: function (options) {
     if (options.pageId) {
       wx.navigateTo({
-        url: '/pages/cityDetail/' + options.pageId + '/' + options.pageId,
+        url: '/pages/cityDetail/cityDetail?city_id=' + options.pageId,
       })
     }
-    this.loadMoreOrganization();
+    this.loadMoreCity();
   },
 
-  loadMoreOrganization() {
+  loadMoreCity() {
     const city = this.data.city;
     app.mpServerless.db.collection('city').find({}, {
       sort: {
@@ -26,9 +29,9 @@ Page({
       skip: city.length,
       limit: 20,
     }).then(res => {
-      const {
-        result: data
-      } = res;
+      const data = (res.result || []).map(item => Object.assign({}, item, {
+        avatar: COS_AVATAR + encodeURIComponent(item.name) + '.png',
+      }));
       this.setData({
         city: city.concat(data)
       });
@@ -39,27 +42,18 @@ Page({
    * 页面上拉触底事件的处理函数
    */
   onReachBottom: function () {
-    this.loadMoreOrganization();
-  },
-
-  // 点击组织
-  clickOrganization(e, isOrganizationId = false) {
-    const city_id = isOrganizationId ? e : e.currentTarget.dataset.city_id;
-    const detail_url = '/pages/cityDetail/cityDetail';
-
-    wx.navigateTo({
-      url: detail_url + '?city_id=' + city_id,
-    });
+    this.loadMoreCity();
   },
 
   //转发此页面的设置
-  onShareAppMessage: function (ops) {
-    if (ops.from === 'button') {
+  onShareAppMessage: function (res) {
+    if (res && res.from === 'button') {
       // 来自页面内转发按钮
-      console.log(ops.target)
+      console.log(res.target)
     }
     return {
-      path: 'pages/index/index', // 路径，传递参数到指定页面。
+      title: 'circle 的旅行地图',
+      path: '/pages/index/index', // 路径，传递参数到指定页面。
       success: function (res) {
         // 转发成功
         console.log("转发成功:" + JSON.stringify(res));
@@ -73,12 +67,13 @@ Page({
 
   // 转发到朋友圈
   onShareTimeline: function (res) {
-    if (ops.from === 'button') {
+    if (res && res.from === 'button') {
       // 来自页面内转发按钮
-      console.log(ops.target)
+      console.log(res.target)
     }
     return {
-      path: 'pages/index/index', // 路径，传递参数到指定页面。
+      title: 'circle 的旅行地图',
+      path: '/pages/index/index', // 路径，传递参数到指定页面。
       success: function (res) {
         // 转发成功
         console.log("转发成功:" + JSON.stringify(res));
@@ -92,15 +87,23 @@ Page({
 
   // 搜索栏输入名字后页面跳转
   bindconfirmT: function (e) {
-    if (e.detail.value) {
-      const city = this.data.city;
-      app.mpServerless.db.collection('city').find({
-        name: e.detail.value
-      }, {}).then(res => {
-        wx.navigateTo({
-          url: '/pages/cityDetail/cityDetail?city_id=' + res.result[0]._id,
-        })
-      }).catch(console.error);
-    }
+    const keyword = (e.detail.value || '').trim();
+    if (!keyword) return;
+
+    app.mpServerless.db.collection('city').find({
+      name: keyword
+    }, {}).then(res => {
+      const city = res.result && res.result[0];
+      if (!city) {
+        wx.showToast({
+          title: '没有找到该城市',
+          icon: 'none',
+        });
+        return;
+      }
+      wx.navigateTo({
+        url: '/pages/cityDetail/cityDetail?city_id=' + city._id,
+      })
+    }).catch(console.error);
   },
 })

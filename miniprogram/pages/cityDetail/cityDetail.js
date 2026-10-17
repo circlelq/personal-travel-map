@@ -1,49 +1,81 @@
-var city_id = "1";
 const app = getApp();
+
+// COS 目录，城市名与照片名都需要 URL 编码后拼接
+const COS_AVATAR = 'https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E5%A4%B4%E5%83%8F/';
+const COS_PREVIEW = 'https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E9%A2%84%E8%A7%88%E5%9B%BE/';
+const COS_ORIGINAL = 'https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E5%8E%9F%E5%9B%BE/';
 
 Page({
   data: {
     city: {},
     markers: [],
-    photoscr: "",
-    photoscrOriginal: "",
+    photos: [],
+    cover: "",
+    coverOriginal: "",
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    city_id = options.city_id;
-    app.mpServerless.db.collection('city').find({
-      _id: city_id,
-    }, {}).then(res => {
-      this.setData({
-        city: res.result[0],
-        photoscr: "https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E9%A2%84%E8%A7%88%E5%9B%BE/" + res.result[0].name + "/" + res.result[0].name + ".jpg",
-        photoscrOriginal: "https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E5%8E%9F%E5%9B%BE/" + res.result[0].name + "/" + res.result[0].name + ".jpg"
+    const cityId = options.city_id;
+    if (!cityId) {
+      wx.showToast({
+        title: '缺少城市参数',
+        icon: 'none',
       });
-    }).then(res => {
-      var number = 0
-      for (var i in this.data.city.markers) {
-        var marker = [{
-          iconPath: "https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E5%A4%B4%E5%83%8F/" + encodeURIComponent(this.data.city.name) + ".png",
-          latitude: this.data.city.markers[i].coordinates[0],
-          longitude: this.data.city.markers[i].coordinates[1],
+      return;
+    }
+
+    app.mpServerless.db.collection('city').find({
+      _id: cityId,
+    }, {}).then(res => {
+      const city = res.result && res.result[0];
+      if (!city) {
+        wx.showToast({
+          title: '没有找到该城市',
+          icon: 'none',
+        });
+        return;
+      }
+
+      const nameEncoded = encodeURIComponent(city.name);
+      const points = Object.keys(city.markers || {})
+        .map(key => (city.markers[key] || {}).coordinates)
+        .filter(coordinates => coordinates && coordinates.length >= 2);
+      const markers = points.map((coordinates, index) => {
+        return {
+          iconPath: COS_AVATAR + nameEncoded + '.png',
+          latitude: coordinates[0],
+          longitude: coordinates[1],
           width: 50,
           height: 50,
-          id: number,
-        }]
-        this.setData({
-          markers: this.data.markers.concat(marker),
-        });
-        number++
-      }
-    });
+          id: index,
+        };
+      });
+      const photos = (city.photo || []).map(item => {
+        const photoName = encodeURIComponent(item[0]);
+        return {
+          preview: COS_PREVIEW + nameEncoded + '/' + photoName + '.jpg',
+          original: COS_ORIGINAL + nameEncoded + '/' + photoName + '.jpg',
+          legend: [item[1], item[2]].filter(Boolean).join(' '),
+        };
+      });
+
+      this.setData({
+        city: city,
+        markers: markers,
+        photos: photos,
+        cover: COS_PREVIEW + nameEncoded + '/' + nameEncoded + '.jpg',
+        coverOriginal: COS_ORIGINAL + nameEncoded + '/' + nameEncoded + '.jpg',
+      }, () => {
+        this.includePointsOne();
+      });
+    }).catch(console.error);
   },
 
   previewImage: function (e) {
-    let that = this;
-    let src = e.currentTarget.dataset.src;
+    const src = e.currentTarget.dataset.src;
     wx.previewImage({
       current: src,
       urls: [src]
@@ -51,6 +83,8 @@ Page({
   },
 
   includePointsOne() {
+    if (!this.data.markers.length) return;
+
     const mapCtx = wx.createMapContext('map', this);
     mapCtx.includePoints({
       padding: [60, 36, 0, 36],
@@ -64,24 +98,31 @@ Page({
     });
   },
 
-
-  onShow: function (options) {
-
-  },
-
-
   regionchange(e) {
     console.log(e.type)
   },
-  markertap(e) {
-    console.log(e.detail.markerId)
+
+  // 点击标记：用微信内置地图打开该位置
+  markertap(event) {
+    const markerId = event.detail && event.detail.markerId;
+    const marker = this.data.markers.find(item => item.id === Number(markerId));
+    if (!marker) return;
+
+    const name = this.data.city.name;
+    wx.openLocation({
+      latitude: parseFloat(marker.latitude),
+      longitude: parseFloat(marker.longitude),
+      name: name,
+      address: name
+    })
   },
+
   controltap(e) {
     console.log(e.detail.controlId)
   },
 
   onShareAppMessage: function (res) {
-    if (res.from === 'button') {
+    if (res && res.from === 'button') {
       // 来自页面内转发按钮
       console.log(res.target)
     }
@@ -98,7 +139,7 @@ Page({
   },
 
   onShareTimeline: function (res) {
-    if (res.from === 'button') {
+    if (res && res.from === 'button') {
       // 来自页面内转发按钮
       console.log(res.target)
     }
@@ -114,77 +155,6 @@ Page({
     }
   },
 
-
-  markertap(event) {
-    console.log(event.detail.markerId)
-    const markers = this.data.markers;
-    for (let i = 0; i < markers.length; i++) {
-      if (event.markerId === markers[i].id) {
-        wx.openLocation({
-          latitude: parseFloat(markers[i].latitude),
-          longitude: parseFloat(markers[i].longitude),
-          name: markers[i].name,
-          address: markers[i].name
-        })
-
-      }
-    }
-  },
-
-  copyBili: function (e) {
-    var self = this;
-    wx.setClipboardData({
-      data: this.data.city.officialAccount['bili'], //需要复制的内容
-      success: function (res) {
-        console.log("复制成功")
-      }
-    })
-  },
-  copyWeibo: function (e) {
-    var self = this;
-    wx.setClipboardData({
-      data: this.data.city.officialAccount['weibo'], //需要复制的内容
-      success: function (res) {
-        console.log("复制成功")
-      }
-    })
-  },
-  copyWechat: function (e) {
-    var self = this;
-    wx.setClipboardData({
-      data: this.data.city.officialAccount['wechat'], //需要复制的内容
-      success: function (res) {
-        console.log("复制成功")
-      }
-    })
-  },
-  copyMail: function (e) {
-    var self = this;
-    wx.setClipboardData({
-      data: this.data.city.officialAccount['mail'], //需要复制的内容
-      success: function (res) {
-        console.log("复制成功")
-      }
-    })
-  },
-  copyShu: function (e) {
-    var self = this;
-    wx.setClipboardData({
-      data: this.data.city.officialAccount['shu'], //需要复制的内容
-      success: function (res) {
-        console.log("复制成功")
-      }
-    })
-  },
-  copyDouyin: function (e) {
-    var self = this;
-    wx.setClipboardData({
-      data: this.data.city.officialAccount['douyin'], //需要复制的内容
-      success: function (res) {
-        console.log("复制成功")
-      }
-    })
-  },
   naviToMiniBili: function (e) {
     const bid = this.data.city.officialAccount['bili']
     const timestamp = new Date().getTime()
@@ -196,28 +166,17 @@ Page({
       success(res) {}
     })
   },
+
   naviToMiniXhs: function (e) {
     const id = this.data.city.officialAccount['xhs']['id']
     const xsecToken = this.data.city.officialAccount['xhs']['xsecToken']
     const timestamp = new Date().getTime()
     const path = `pages/main/note/index?height=3024&type=normal&xsecToken=${xsecToken}&from=author_page&noteIdx=0&id=${id}`
-    console.log(path)
     wx.navigateToMiniProgram({
       appId: 'wxb296433268a1c654',
-      // path: ,
       path,
       envVersion: 'release',
       success(res) {}
-    })
-  },
-  naviToMini1: function (e) {
-    wx.navigateToMiniProgram({
-      appId: this.data.city.officialAccount['miniprogram1'],
-      // path: 'pages/index/index',
-      envVersion: 'release',
-      success(res) {
-        // 打开成功
-      }
     })
   }
 
