@@ -1,10 +1,103 @@
 /* pages/about/about.wxss */
+page {
+  /* 与地图页保持一致的主色与文字色 */
+  --brand: #557e56;
+  --text-primary: #2c2c2a;
+  --text-secondary: #8a8a8a;
+  --divider: #f0f0f0;
+  background: #f7f8f7;
+}
 
-.logo {
-  font-size: 30rpx;
-  position: relative;
-  bottom: 20rpx;
-  width: 100%;
+.about {
+  padding: 0 32rpx 48rpx;
+}
+
+/* 头部：头像 + 一句话介绍 */
+.hero {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  padding: 72rpx 0 48rpx;
+}
+
+.hero-avatar {
+  width: 176rpx;
+  height: 176rpx;
+  border-radius: 50%;
+  border: 8rpx solid #ffffff;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
+}
+
+.hero-title {
+  margin-top: 28rpx;
+  font-size: 40rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.hero-desc {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  line-height: 40rpx;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* 卡片 */
+.card {
+  margin-top: 24rpx;
+  padding: 8rpx 28rpx;
+  background: #ffffff;
+  border-radius: 20rpx;
+}
+
+.card-title {
+  padding: 24rpx 0 4rpx;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  padding: 28rpx 0;
+}
+
+.row-main {
+  flex: 1;
+  margin-right: 20rpx;
+  overflow: hidden;
+}
+
+.row-label {
+  font-size: 30rpx;
+  color: var(--text-primary);
+}
+
+.row-value {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+  word-break: break-all;
+}
+
+.row-action {
+  flex-shrink: 0;
+  padding: 8rpx 24rpx;
+  border-radius: 999rpx;
+  background: var(--brand);
+  color: #ffffff;
+  font-size: 24rpx;
+}
+
+.divider {
+  height: 1rpx;
+  background: var(--divider);
+}
+
+.footer {
+  margin-top: 48rpx;
+  font-size: 22rpx;
+  color: #b5b5b5;
+  text-align: center;
 }

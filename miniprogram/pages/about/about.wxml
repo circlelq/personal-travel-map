@@ -1,14 +1,40 @@
-<view class="head1">小程序介绍</view>
-<view class="body">
-  记录去过的城市：在地图上点亮足迹，配上照片和游记链接。
-</view>
+<!-- about.wxml -->
+<view class="about">
+  <!-- 头部：头像 + 一句话介绍 -->
+  <view class="hero">
+    <image class="hero-avatar" src="/pages/images/circle.png" mode="aspectFill"></image>
+    <view class="hero-title">circle 的旅行地图</view>
+  </view>
 
-<view class="head1">联系我</view>
-<view class="body">
-  邮箱：<text class="copy" bindtap="copy1">yuanlq@pku.edu.cn</text>（点击复制）
-</view>
+  <!-- 联系我 -->
+  <view class="card">
+    <view class="card-title">联系我</view>
+    <view class="row" bindtap="copy1">
+      <view class="row-main">
+        <view class="row-label">邮箱</view>
+        <view class="row-value">yuanlq@pku.edu.cn</view>
+      </view>
+      <view class="row-action">复制</view>
+    </view>
+  </view>
 
-<view class="weui-footer" display="flex">
-  <view class="weui-footer__text" align-self="flex-end">v1.1.0</view>
+  <!-- 版本与开源 -->
+  <view class="card">
+    <view class="row">
+      <view class="row-main">
+        <view class="row-label">当前版本</view>
+      </view>
+      <view class="row-value">v1.1.0</view>
+    </view>
+    <view class="divider"></view>
+    <view class="row">
+      <view class="row-main">
+        <view class="row-label">开源仓库</view>
+        <view class="row-value">github.com/circlelq/personal-travel-map</view>
+      </view>
+      <view class="row-action" bindtap="copy5">复制</view>
+    </view>
+  </view>
+
+  <view class="footer">记录去过的地方 · 持续更新</view>
 </view>
-<text> \n </text>

@@ -39,6 +39,12 @@ Page({
     })
   },
 
+  copy5: function (e) {
+    wx.setClipboardData({
+      data: 'https://github.com/circlelq/personal-travel-map', //需要复制的内容
+    })
+  },
+
   // 以下三个项目链接暂不在关于页展示，需要时在 about.wxml 里加回入口即可
   copy2: function (e) {
     wx.setClipboardData({
