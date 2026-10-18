@@ -1,20 +1,19 @@
 <!--index.wxml-->
+<view class="page">
+  <navigator class="searchbar" url="/pages/search/search">
+    <image class="searchbar-avatar" src="/pages/images/circle.png" mode="aspectFill"></image>
+    <text class="searchbar-text">搜索城市</text>
+  </navigator>
 
-<navigator class="circle" url="/pages/search/search">
-  <image class='avator' src="/pages/images/circle.png" mode='aspectFill'></image>
-  <text class="search">点击搜索</text>
-</navigator>
-
-<view class="container">
-  <view class="divLineLong"></view>
-</view>
-
-<navigator block wx:for="{{city}}" wx:key="_id" url="/pages/cityDetail/cityDetail?city_id={{item._id}}">
-  <view>
-    <view class="catitem">
-      <image class='avator' lazy-load='true' src="{{item.avatar}}" mode='aspectFill'></image>
-      <view class="cat-name">{{item.name}}</view>
+  <view class="waterfall">
+    <view class="waterfall-col" wx:for="{{columns}}" wx:for-item="column" wx:for-index="colIndex" wx:key="colIndex">
+      <navigator class="card" wx:for="{{column}}" wx:for-item="item" wx:key="_id" url="/pages/cityDetail/cityDetail?city_id={{item._id}}">
+        <image class="card-cover" src="{{item.cover}}" mode="widthFix" lazy-load="true"></image>
+        <view class="card-body">
+          <view class="card-title">{{item.name}}</view>
+          <view class="card-meta">{{item.photoCount}} 张照片</view>
+        </view>
+      </navigator>
     </view>
-    <view class="divLine"></view>
   </view>
-</navigator>
+</view>

@@ -1,12 +1,18 @@
 const app = getApp();
 
-// COS 头像目录，城市名需要 URL 编码后拼接
+// COS 目录，城市名与照片名都需要 URL 编码后拼接
 const COS_AVATAR = 'https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E5%A4%B4%E5%83%8F/';
+const COS_PREVIEW = 'https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E9%A2%84%E8%A7%88%E5%9B%BE/';
 
 Page({
   data: {
     city: [],
+    columns: [[], []],
   },
+
+  // 排版用的内部状态，不进 data，避免无谓的视图层通信
+  _columns: [[], []],
+  _count: 0,
 
   /**
    * 生命周期函数--监听页面加载
@@ -29,13 +35,37 @@ Page({
       skip: city.length,
       limit: 20,
     }).then(res => {
-      const data = (res.result || []).map(item => Object.assign({}, item, {
-        avatar: COS_AVATAR + encodeURIComponent(item.name) + '.png',
-      }));
+      const data = (res.result || []).map(item => {
+        const nameEncoded = encodeURIComponent(item.name);
+        const photos = item.photo || [];
+        return Object.assign({}, item, {
+          // 首张照片作封面，没有照片的城市用头像兜底
+          cover: photos.length
+            ? COS_PREVIEW + nameEncoded + '/' + encodeURIComponent(photos[0][0]) + '.jpg'
+            : COS_AVATAR + nameEncoded + '.png',
+          photoCount: photos.length,
+        });
+      });
+
       this.setData({
         city: city.concat(data)
       });
+      this.appendToWaterfall(data);
     }).catch(console.error);
+  },
+
+  // 按数据顺序左右交替落列，卡片高度由图片自身比例撑开，不追求两列底部齐平
+  appendToWaterfall(items) {
+    if (!items.length) return;
+
+    items.forEach(item => {
+      this._columns[this._count % 2].push(item);
+      this._count++;
+    });
+
+    this.setData({
+      columns: [this._columns[0].slice(), this._columns[1].slice()]
+    });
   },
 
   /**

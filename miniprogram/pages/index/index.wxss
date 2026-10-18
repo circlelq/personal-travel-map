@@ -1,7 +1,78 @@
-/*搜索框*/
-.search {
-  font-size: 32rpx;
-  margin-left: 150rpx;
-  /* height: 32rpx; */
-  color: #888888;
+/* pages/index/index.wxss */
+page {
+  --brand: #557e56;
+  --text-primary: #2c2c2a;
+  --text-secondary: #8a8a8a;
+  background: #f7f8f7;
+}
+
+.page {
+  min-height: 100vh;
+  padding: 24rpx 24rpx 40rpx;
+}
+
+/* 顶部搜索栏 */
+.searchbar {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 24rpx;
+  background: #ffffff;
+  border-radius: 999rpx;
+}
+
+.searchbar-avatar {
+  flex-shrink: 0;
+  width: 48rpx;
+  height: 48rpx;
+  margin-right: 16rpx;
+  border-radius: 50%;
+}
+
+.searchbar-text {
+  font-size: 26rpx;
+  color: #999999;
+}
+
+/* 瀑布流：两列等宽，卡片高度由图片自身比例决定 */
+.waterfall {
+  display: flex;
+  margin-top: 24rpx;
+}
+
+.waterfall-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.waterfall-col + .waterfall-col {
+  margin-left: 16rpx;
+}
+
+.card {
+  display: block;
+  margin-bottom: 16rpx;
+  background: #ffffff;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.card-cover {
+  display: block;
+  width: 100%;
+}
+
+.card-body {
+  padding: 16rpx 18rpx 20rpx;
+}
+
+.card-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.card-meta {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: var(--text-secondary);
 }
