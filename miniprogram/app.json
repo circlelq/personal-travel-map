@@ -9,10 +9,13 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": " circle 的旅行地图",
+    "navigationBarTitleText": "circle 的旅行地图",
     "navigationBarTextStyle": "black"
   },
   "sitemapLocation": "sitemap.json",
+  "requiredPrivateInfos": [
+    "getLocation"
+  ],
   "tabBar": {
     "selectedColor": "#557e56",
     "color": "#888888",

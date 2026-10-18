@@ -1,15 +1,135 @@
 page {
-  display: flex;
-  flex-direction: column;
+  /* 与 tabBar 主色保持一致，改色只改这里 */
+  --brand: #557e56;
+  --text-primary: #2c2c2a;
+  --text-secondary: #8a8a8a;
+  --surface: rgba(255, 255, 255, 0.94);
   height: 100%;
 }
 
-
-.back {
-  font-size: 40rpx;
-  position: absolute;
-  bottom: 20rpx;
+.map-wrap {
+  position: relative;
   width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+}
+
+/* 左上角足迹统计 */
+.stat {
+  position: absolute;
+  left: 24rpx;
+  top: 24rpx;
   display: flex;
+  align-items: baseline;
+  padding: 12rpx 24rpx;
+  background: var(--surface);
+  border-radius: 999rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+}
+
+.stat-num {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--brand);
+}
+
+.stat-label {
+  margin-left: 8rpx;
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+/* 右下角控件组 */
+.controls {
+  position: absolute;
+  right: 24rpx;
+  bottom: 200rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ctrl {
+  width: 88rpx;
+  height: 88rpx;
+  margin-top: 20rpx;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.14);
+  display: flex;
+  align-items: center;
   justify-content: center;
+}
+
+.ctrl:first-child {
+  margin-top: 0;
+}
+
+.ctrl-text {
+  font-size: 24rpx;
+  color: var(--text-primary);
+}
+
+.ctrl-icon {
+  font-size: 40rpx;
+  color: var(--brand);
+}
+
+/* 底部城市卡片 */
+.card {
+  position: absolute;
+  left: 24rpx;
+  right: 24rpx;
+  bottom: 24rpx;
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  background: #ffffff;
+  border-radius: 20rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  transform: translateY(160%);
+  transition: transform 0.24s ease, opacity 0.24s ease;
+}
+
+.card-show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card-avatar {
+  flex-shrink: 0;
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  background: #f2f2f2;
+}
+
+.card-info {
+  flex: 1;
+  margin: 0 20rpx;
+  overflow: hidden;
+}
+
+.card-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.card-btn {
+  flex-shrink: 0;
+  padding: 12rpx 28rpx;
+  border-radius: 999rpx;
+  background: var(--brand);
+  color: #ffffff;
+  font-size: 26rpx;
 }
