@@ -1,12 +1,12 @@
 // map.js
 const app = getApp();
 
-// COS 头像目录，城市名需要 URL 编码后拼接
-const COS_AVATAR = 'https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E5%A4%B4%E5%83%8F/';
+import { normalizeCity, avatarUrl } from '../../utils/city';
 
 Page({
   data: {
     markers: [],
+    cityCount: 0,
     selected: null,
     showCard: false,
     latitude: 34.089061,
@@ -22,25 +22,22 @@ Page({
   },
 
   loadMarkers() {
-    app.mpServerless.db.collection('city').find({}, {}).then(res => {
-      const allCity = res.result || [];
+    app.mpServerless.db.collection('city').find({}, {
+      limit: 100,
+    }).then(res => {
+      const allCity = (res.result || []).map(normalizeCity).filter(Boolean);
       const markers = [];
       let number = 0;
 
       allCity.forEach(city => {
-        const avatar = COS_AVATAR + encodeURIComponent(city.name) + '.png';
-        const points = city.markers || {};
+        const avatar = avatarUrl(city.name);
 
-        Object.keys(points).forEach(key => {
-          const point = points[key];
-          const coordinates = point && point.coordinates;
-          if (!coordinates || coordinates.length < 2) return;
-
+        city.locations.forEach(point => {
           markers.push({
             id: number,
             city_id: city._id,
-            latitude: coordinates[0],
-            longitude: coordinates[1],
+            latitude: point.lat,
+            longitude: point.lng,
             iconPath: avatar,
             width: 50,
             height: 50,
@@ -67,7 +64,8 @@ Page({
 
       // 一次性 setData，避免每个 marker 触发一次视图层通信
       this.setData({
-        markers: markers
+        markers: markers,
+        cityCount: allCity.length,
       }, () => {
         this.resetViewport();
       });

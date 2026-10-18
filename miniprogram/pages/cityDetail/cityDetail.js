@@ -1,9 +1,12 @@
 const app = getApp();
 
-// COS 目录，城市名与照片名都需要 URL 编码后拼接
-const COS_AVATAR = 'https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E5%A4%B4%E5%83%8F/';
-const COS_PREVIEW = 'https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E9%A2%84%E8%A7%88%E5%9B%BE/';
-const COS_ORIGINAL = 'https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E5%8E%9F%E5%9B%BE/';
+import {
+  normalizeCity,
+  avatarUrl,
+  previewUrl,
+  originalUrl,
+  coverNameUrl,
+} from '../../utils/city';
 
 Page({
   data: {
@@ -30,7 +33,7 @@ Page({
     app.mpServerless.db.collection('city').find({
       _id: cityId,
     }, {}).then(res => {
-      const city = res.result && res.result[0];
+      const city = normalizeCity(res.result && res.result[0]);
       if (!city) {
         wx.showToast({
           title: '没有找到该城市',
@@ -39,26 +42,21 @@ Page({
         return;
       }
 
-      const nameEncoded = encodeURIComponent(city.name);
-      const points = Object.keys(city.markers || {})
-        .map(key => (city.markers[key] || {}).coordinates)
-        .filter(coordinates => coordinates && coordinates.length >= 2);
-      const markers = points.map((coordinates, index) => {
+      const markers = city.locations.map((point, index) => {
         return {
-          iconPath: COS_AVATAR + nameEncoded + '.png',
-          latitude: coordinates[0],
-          longitude: coordinates[1],
+          iconPath: avatarUrl(city.name),
+          latitude: point.lat,
+          longitude: point.lng,
           width: 50,
           height: 50,
           id: index,
         };
       });
-      const photos = (city.photo || []).map(item => {
-        const photoName = encodeURIComponent(item[0]);
+      const photos = city.photos.map(item => {
         return {
-          preview: COS_PREVIEW + nameEncoded + '/' + photoName + '.jpg',
-          original: COS_ORIGINAL + nameEncoded + '/' + photoName + '.jpg',
-          legend: [item[1], item[2]].filter(Boolean).join(' '),
+          preview: previewUrl(city.name, item.file),
+          original: originalUrl(city.name, item.file),
+          legend: [item.title, item.date].filter(Boolean).join(' '),
         };
       });
 
@@ -66,8 +64,8 @@ Page({
         city: city,
         markers: markers,
         photos: photos,
-        cover: COS_PREVIEW + nameEncoded + '/' + nameEncoded + '.jpg',
-        coverOriginal: COS_ORIGINAL + nameEncoded + '/' + nameEncoded + '.jpg',
+        cover: coverNameUrl(city.name, false),
+        coverOriginal: coverNameUrl(city.name, true),
       }, () => {
         this.includePointsOne();
       });
@@ -156,7 +154,7 @@ Page({
   },
 
   naviToMiniBili: function (e) {
-    const bid = this.data.city.officialAccount['bili']
+    const bid = this.data.city.links.bili
     const timestamp = new Date().getTime()
     const path = `pages/video/video?__preload_=${timestamp*10+3}&__key_=${timestamp*10+4}&bvid=${bid}`
     wx.navigateToMiniProgram({
@@ -168,8 +166,8 @@ Page({
   },
 
   naviToMiniXhs: function (e) {
-    const id = this.data.city.officialAccount['xhs']['id']
-    const xsecToken = this.data.city.officialAccount['xhs']['xsecToken']
+    const id = this.data.city.links.xhs.id
+    const xsecToken = this.data.city.links.xhs.xsecToken
     const timestamp = new Date().getTime()
     const path = `pages/main/note/index?height=3024&type=normal&xsecToken=${xsecToken}&from=author_page&noteIdx=0&id=${id}`
     wx.navigateToMiniProgram({

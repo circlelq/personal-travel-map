@@ -7,11 +7,11 @@
 </view>
 
 <view class="itemname1">
-  <view wx:if="{{city.officialAccount['bili']}}" bindtap="naviToMiniBili" style='flex-shrink:0; box-sizing:border-box; width:3rem; margin-right:2rem; margin-bottom:1rem;'>
+  <view wx:if="{{city.links.bili}}" bindtap="naviToMiniBili" style='flex-shrink:0; box-sizing:border-box; width:3rem; margin-right:2rem; margin-bottom:1rem;'>
     <image style="width:3rem;height:3rem;" src="/pages/images/bili.png"></image>
     <view style="text-align: center;  color:#353535;"> \n B 站 </view>
   </view>
-  <view wx:if="{{city.officialAccount['xhs']}}" bindtap="naviToMiniXhs" style='flex-shrink:0; box-sizing:border-box; width:3rem; margin-right:2rem; margin-bottom:1rem;'>
+  <view wx:if="{{city.links.xhs}}" bindtap="naviToMiniXhs" style='flex-shrink:0; box-sizing:border-box; width:3rem; margin-right:2rem; margin-bottom:1rem;'>
     <image style="width:3rem;height:3rem;" src="/pages/images/xhs.png"></image>
     <view style="text-align: center;  color:#353535;"> \n 小红书 </view>
   </view>
@@ -27,12 +27,6 @@
     {{item.legend}}
   </view>
   <text> \n </text>
-</block>
-
-<block wx:for="{{city.mainContent}}">
-  <view class="{{item[0]}}">
-    <text user-select="true">{{item[1]}}</text>
-  </view>
 </block>
 
 <text> \n </text>

@@ -24,7 +24,7 @@
       <view class="row-main">
         <view class="row-label">当前版本</view>
       </view>
-      <view class="row-value">v1.1.0</view>
+      <view class="row-value">v1.2.0</view>
     </view>
     <view class="divider"></view>
     <view class="row">

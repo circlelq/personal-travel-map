@@ -15,10 +15,19 @@
 
   <view class="result">
     <navigator class="item" wx:for="{{city}}" wx:key="_id" url="/pages/cityDetail/cityDetail?city_id={{item._id}}">
-      <image class="item-cover" src="{{item.cover}}" mode="aspectFill" lazy-load="true"></image>
+      <image
+        class="item-cover"
+        src="{{item.cover}}"
+        mode="aspectFill"
+        lazy-load="true"
+        binderror="onCoverError"
+        data-index="{{index}}"
+        data-current="{{item.cover}}"
+        data-src="{{item.coverFallback}}"
+      ></image>
       <view class="item-body">
         <view class="item-name">{{item.name}}</view>
-        <view class="item-meta">{{item.photoCount}} 张照片</view>
+        <view class="item-meta" wx:if="{{item.photoCount}}">{{item.photoCount}} 张照片</view>
       </view>
     </navigator>
 

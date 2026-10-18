@@ -8,10 +8,19 @@
   <view class="waterfall">
     <view class="waterfall-col" wx:for="{{columns}}" wx:for-item="column" wx:for-index="colIndex" wx:key="colIndex">
       <navigator class="card" wx:for="{{column}}" wx:for-item="item" wx:key="_id" url="/pages/cityDetail/cityDetail?city_id={{item._id}}">
-        <image class="card-cover" src="{{item.cover}}" mode="widthFix" lazy-load="true"></image>
+        <image
+          class="card-cover"
+          src="{{item.cover}}"
+          mode="widthFix"
+          lazy-load="true"
+          binderror="onCoverError"
+          data-path="columns[{{colIndex}}][{{index}}].cover"
+          data-current="{{item.cover}}"
+          data-src="{{item.coverFallback}}"
+        ></image>
         <view class="card-body">
           <view class="card-title">{{item.name}}</view>
-          <view class="card-meta">{{item.photoCount}} 张照片</view>
+          <view class="card-meta" wx:if="{{item.photoCount}}">{{item.photoCount}} 张照片</view>
         </view>
       </navigator>
     </view>

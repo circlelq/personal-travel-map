@@ -1,25 +1,12 @@
 const app = getApp();
 
-// COS 目录，城市名与照片名都需要 URL 编码后拼接
-const COS_AVATAR = 'https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E5%A4%B4%E5%83%8F/';
-const COS_PREVIEW = 'https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E9%A2%84%E8%A7%88%E5%9B%BE/';
-
-// 列表项封面：首张照片，没有照片的城市用头像兜底
-function buildCover(item) {
-  const nameEncoded = encodeURIComponent(item.name);
-  const photos = item.photo || [];
-  return Object.assign({}, item, {
-    cover: photos.length
-      ? COS_PREVIEW + nameEncoded + '/' + encodeURIComponent(photos[0][0]) + '.jpg'
-      : COS_AVATAR + nameEncoded + '.png',
-    photoCount: photos.length,
-  });
-}
-
-// 把关键字拆成单字，字与字之间允许任意字符，实现「模糊顺序匹配」
-function buildPattern(keyword) {
-  return '(.*)(' + keyword.split('').join(')(.*)(') + ')(.*)';
-}
+import {
+  normalizeCity,
+  compareByLastVisit,
+  coverUrl,
+  fallbackCoverUrl,
+  buildCityQueries,
+} from '../../utils/city';
 
 Page({
   data: {
@@ -27,6 +14,9 @@ Page({
     inputValue: "",
     emptyText: "输入城市名称开始搜索",
   },
+
+  // 输入过程中会连发请求，只认最后一次的结果
+  _seq: 0,
 
   /**
    * 生命周期函数--监听页面加载
@@ -39,7 +29,7 @@ Page({
     }
   },
 
-  loadMoreCity() {
+  async loadCity() {
     const keyword = (this.data.inputValue || '').trim();
     if (!keyword) {
       this.setData({
@@ -49,32 +39,42 @@ Page({
       return;
     }
 
-    const pattern = buildPattern(keyword);
-    const options = {
-      sort: {
-        pinyin: 1
-      }
-    };
-    const render = res => {
-      const data = (res.result || []).map(buildCover);
-      this.setData({
-        city: data,
-        emptyText: data.length ? "" : "没有找到相关城市"
-      });
-    };
+    const seq = ++this._seq;
 
-    // 优先带 $options:'i' 忽略大小写；若服务端不支持该字段，回退为普通正则
-    app.mpServerless.db.collection('city').find({
-      name: {
-        $regex: pattern,
-        $options: 'i'
+    for (const query of buildCityQueries(keyword)) {
+      try {
+        const res = await app.mpServerless.db.collection('city').find(query, {
+          limit: 100
+        });
+
+        // 期间又输入了新内容，丢弃这次的过期结果
+        if (seq !== this._seq) return;
+
+        const data = (res.result || [])
+          .map(normalizeCity)
+          .filter(Boolean)
+          .map(item => Object.assign({}, item, {
+            cover: coverUrl(item),
+            coverFallback: fallbackCoverUrl(item),
+            photoCount: item.photos.length,
+          }));
+
+        data.sort(compareByLastVisit);
+
+        this.setData({
+          city: data,
+          emptyText: data.length ? "" : "没有找到相关城市"
+        });
+        return;
+      } catch (err) {
+        console.error('搜索失败，尝试下一种查询', err);
       }
-    }, options).then(render).catch(() => {
-      return app.mpServerless.db.collection('city').find({
-        name: {
-          $regex: pattern
-        }
-      }, options).then(render).catch(console.error);
+    }
+
+    if (seq !== this._seq) return;
+    this.setData({
+      city: [],
+      emptyText: "搜索失败，请稍后再试"
     });
   },
 
@@ -93,10 +93,23 @@ Page({
     this.setData({
       inputValue: e.detail.value || ""
     })
-    this.loadMoreCity();
+    this.loadCity();
   },
 
-  // 搜索栏输入名字后页面跳转
+  // 城市同名封面缺失时换成首张照片，再失败就保持原样，避免反复触发
+  onCoverError(e) {
+    const index = e.currentTarget.dataset.index;
+    const src = e.currentTarget.dataset.src;
+    const current = e.currentTarget.dataset.current;
+
+    if (index === undefined || !src || src === current) return;
+
+    this.setData({
+      ['city[' + index + '].cover']: src,
+    });
+  },
+
+  // 搜索栏输入名字后直接进详情
   bindconfirmT: function (e) {
     const keyword = (e.detail.value || '').trim();
     if (!keyword) return;

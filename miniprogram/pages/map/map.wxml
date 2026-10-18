@@ -20,9 +20,9 @@
   </map>
 
   <!-- 左上角足迹统计 -->
-  <view class="stat" wx:if="{{markers.length}}">
-    <text class="stat-num">{{markers.length}}</text>
-    <text class="stat-label">个足迹</text>
+  <view class="stat" wx:if="{{cityCount}}">
+    <text class="stat-num">{{cityCount}}</text>
+    <text class="stat-label">座城市</text>
   </view>
 
   <!-- 右下角控件 -->
