@@ -6,15 +6,21 @@ import {
   previewUrl,
   originalUrl,
   coverNameUrl,
+  fallbackCoverUrl,
 } from '../../utils/city';
 
 Page({
   data: {
+    loading: true,
+    error: '',
     city: {},
     markers: [],
     photos: [],
+    previewUrls: [],
     cover: "",
     coverOriginal: "",
+    subtitle: "",
+    stats: [],
   },
 
   /**
@@ -23,9 +29,9 @@ Page({
   onLoad: function (options) {
     const cityId = options.city_id;
     if (!cityId) {
-      wx.showToast({
-        title: '缺少城市参数',
-        icon: 'none',
+      this.setData({
+        loading: false,
+        error: '缺少城市参数',
       });
       return;
     }
@@ -35,9 +41,9 @@ Page({
     }, {}).then(res => {
       const city = normalizeCity(res.result && res.result[0]);
       if (!city) {
-        wx.showToast({
-          title: '没有找到该城市',
-          icon: 'none',
+        this.setData({
+          loading: false,
+          error: '没有找到该城市',
         });
         return;
       }
@@ -50,34 +56,75 @@ Page({
           width: 50,
           height: 50,
           id: index,
+          name: point.name || city.name,
+          callout: {
+            content: point.name || city.name,
+            color: '#2C2C2A',
+            fontSize: 12,
+            bgColor: '#FFFFFF',
+            padding: 8,
+            borderRadius: 8,
+            display: 'BYCLICK',
+            textAlign: 'center',
+          },
         };
       });
       const photos = city.photos.map(item => {
         return {
           preview: previewUrl(city.name, item.file),
           original: originalUrl(city.name, item.file),
-          legend: [item.title, item.date].filter(Boolean).join(' '),
+          legend: [item.title, item.date].filter(Boolean).join(' · '),
         };
       });
 
       this.setData({
+        loading: false,
         city: city,
         markers: markers,
         photos: photos,
+        previewUrls: [coverNameUrl(city.name, true)].concat(
+          photos.map(item => item.original)
+        ),
         cover: coverNameUrl(city.name, false),
         coverOriginal: coverNameUrl(city.name, true),
+        subtitle: buildSubtitle(city),
+        stats: buildStats(city),
       }, () => {
         this.includePointsOne();
       });
-    }).catch(console.error);
+    }).catch(err => {
+      console.error(err);
+      this.setData({
+        loading: false,
+        error: '加载失败，请稍后再试',
+      });
+    });
   },
 
+  // 打开大图，可左右滑动浏览该城市的所有照片
   previewImage: function (e) {
     const src = e.currentTarget.dataset.src;
+    const urls = this.data.previewUrls;
+    if (!src || !urls.length) return;
+
     wx.previewImage({
       current: src,
-      urls: [src]
-    })
+      urls: urls,
+    });
+  },
+
+  // 城市同名封面缺失时改用第一张照片
+  onCoverError() {
+    const city = this.data.city;
+    if (!city || !city.name) return;
+
+    const fallback = fallbackCoverUrl(city);
+    if (fallback === this.data.cover) return;
+
+    this.setData({
+      cover: fallback,
+      coverOriginal: fallback,
+    });
   },
 
   includePointsOne() {
@@ -87,17 +134,7 @@ Page({
     mapCtx.includePoints({
       padding: [60, 36, 0, 36],
       points: this.data.markers,
-      success: res => {
-        console.log('includePoints success');
-      },
-      fail: err => {
-        console.log('includePoints fail', err);
-      }
     });
-  },
-
-  regionchange(e) {
-    console.log(e.type)
   },
 
   // 点击标记：用微信内置地图打开该位置
@@ -110,13 +147,9 @@ Page({
     wx.openLocation({
       latitude: parseFloat(marker.latitude),
       longitude: parseFloat(marker.longitude),
-      name: name,
-      address: name
-    })
-  },
-
-  controltap(e) {
-    console.log(e.detail.controlId)
+      name: marker.name || name,
+      address: name,
+    });
   },
 
   onShareAppMessage: function (res) {
@@ -127,12 +160,6 @@ Page({
     return {
       title: this.data.city.name,
       path: '/pages/cityDetail/cityDetail?city_id=' + this.data.city._id,
-      success: function (res) {
-        // 转发成功
-      },
-      fail: function (res) {
-        // 转发失败
-      }
     }
   },
 
@@ -144,38 +171,76 @@ Page({
     return {
       title: this.data.city.name,
       path: '/pages/cityDetail/cityDetail?city_id=' + this.data.city._id,
-      success: function (res) {
-        // 转发成功
-      },
-      fail: function (res) {
-        // 转发失败
-      }
     }
   },
 
-  naviToMiniBili: function (e) {
-    const bid = this.data.city.links.bili
-    const timestamp = new Date().getTime()
-    const path = `pages/video/video?__preload_=${timestamp*10+3}&__key_=${timestamp*10+4}&bvid=${bid}`
+  naviToMiniBili: function () {
+    const bid = this.data.city.links.bili;
+    const timestamp = new Date().getTime();
+    const path = 'pages/video/video?__preload_=' + (timestamp * 10 + 3) +
+      '&__key_=' + (timestamp * 10 + 4) + '&bvid=' + bid;
+
     wx.navigateToMiniProgram({
       appId: 'wx7564fd5313d24844',
-      path,
+      path: path,
       envVersion: 'release',
-      success(res) {}
-    })
+    });
   },
 
-  naviToMiniXhs: function (e) {
-    const id = this.data.city.links.xhs.id
-    const xsecToken = this.data.city.links.xhs.xsecToken
-    const timestamp = new Date().getTime()
-    const path = `pages/main/note/index?height=3024&type=normal&xsecToken=${xsecToken}&from=author_page&noteIdx=0&id=${id}`
+  naviToMiniXhs: function () {
+    const xhs = this.data.city.links.xhs;
+    const timestamp = new Date().getTime();
+    const path = 'pages/main/note/index?height=3024&type=normal' +
+      '&xsecToken=' + xhs.xsecToken + '&from=author_page&noteIdx=0&id=' + xhs.id;
+
     wx.navigateToMiniProgram({
       appId: 'wxb296433268a1c654',
-      path,
+      path: path,
       envVersion: 'release',
-      success(res) {}
-    })
+    });
+  },
+})
+
+// 封面下方的一行说明：所在地、最近到访、到访次数
+function buildSubtitle(city) {
+  const parts = [];
+
+  const place = [city.country, city.region].filter(Boolean).join(' · ');
+  if (place) parts.push(place);
+
+  if (city.visits.length) {
+    let text = '最近到访 ' + city.visits[0];
+    if (city.visits.length > 1) {
+      text += '，共 ' + city.visits.length + ' 次';
+    }
+    parts.push(text);
   }
 
-})
+  return parts.join(' · ');
+}
+
+// 概览数字，为零的项不显示
+function buildStats(city) {
+  const stats = [];
+
+  if (city.photos.length) {
+    stats.push({
+      value: city.photos.length,
+      label: '张照片',
+    });
+  }
+  if (city.visits.length) {
+    stats.push({
+      value: city.visits.length,
+      label: '次到访',
+    });
+  }
+  if (city.locations.length) {
+    stats.push({
+      value: city.locations.length,
+      label: '个地点',
+    });
+  }
+
+  return stats;
+}

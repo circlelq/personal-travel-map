@@ -1,38 +1,80 @@
-<view class="title">
-  <text user-select="true">{{city.name}}</text>
-</view>
-<view style="display:flex; justify-content:center; align-items:center;">
-  <image mode="widthFix" src="{{cover}}" data-src="{{coverOriginal}}" bindtap='previewImage' style="width: 90%;">
-  </image>
-</view>
-
-<view class="itemname1">
-  <view wx:if="{{city.links.bili}}" bindtap="naviToMiniBili" style='flex-shrink:0; box-sizing:border-box; width:3rem; margin-right:2rem; margin-bottom:1rem;'>
-    <image style="width:3rem;height:3rem;" src="/pages/images/bili.png"></image>
-    <view style="text-align: center;  color:#353535;"> \n B 站 </view>
+<!-- cityDetail.wxml -->
+<view class="page" wx:if="{{!error}}">
+  <!-- 封面 -->
+  <view class="hero">
+    <image
+      class="hero-cover"
+      src="{{cover}}"
+      mode="widthFix"
+      bindtap="previewImage"
+      data-src="{{coverOriginal}}"
+      binderror="onCoverError"
+    ></image>
+    <view class="hero-body">
+      <view class="hero-name">{{city.name}}</view>
+      <view class="hero-sub" wx:if="{{subtitle}}">{{subtitle}}</view>
+    </view>
   </view>
-  <view wx:if="{{city.links.xhs}}" bindtap="naviToMiniXhs" style='flex-shrink:0; box-sizing:border-box; width:3rem; margin-right:2rem; margin-bottom:1rem;'>
-    <image style="width:3rem;height:3rem;" src="/pages/images/xhs.png"></image>
-    <view style="text-align: center;  color:#353535;"> \n 小红书 </view>
+
+  <!-- 概览 -->
+  <view class="stats" wx:if="{{stats.length}}">
+    <view class="stat" wx:for="{{stats}}" wx:key="label">
+      <text class="stat-num">{{item.value}}</text>
+      <text class="stat-label">{{item.label}}</text>
+    </view>
   </view>
+
+  <!-- 外链 -->
+  <view class="links" wx:if="{{city.links.bili || city.links.xhs}}">
+    <view class="link" wx:if="{{city.links.bili}}" bindtap="naviToMiniBili">
+      <image class="link-icon" src="/pages/images/bili.png" mode="aspectFit"></image>
+      <text class="link-text">B 站游记</text>
+    </view>
+    <view class="link" wx:if="{{city.links.xhs}}" bindtap="naviToMiniXhs">
+      <image class="link-icon" src="/pages/images/xhs.png" mode="aspectFit"></image>
+      <text class="link-text">小红书</text>
+    </view>
+  </view>
+
+  <!-- 照片 -->
+  <view class="section" wx:if="{{photos.length}}">
+    <view class="section-title">照片</view>
+    <view class="photo" wx:for="{{photos}}" wx:key="preview">
+      <image
+        class="photo-img"
+        src="{{item.preview}}"
+        mode="widthFix"
+        lazy-load="true"
+        bindtap="previewImage"
+        data-src="{{item.original}}"
+      ></image>
+      <view class="legend" wx:if="{{item.legend}}">{{item.legend}}</view>
+    </view>
+  </view>
+
+  <!-- 位置 -->
+  <view class="section" wx:if="{{markers.length}}">
+    <view class="section-title">位置</view>
+    <view class="map-card">
+      <map
+        id="map"
+        class="city-map"
+        markers="{{markers}}"
+        bindmarkertap="markertap"
+        bindupdated="includePointsOne"
+        show-location
+      ></map>
+    </view>
+    <view class="map-tip">点击标记可在微信地图中查看</view>
+  </view>
+
+  <view class="footer">— {{city.name}} —</view>
 </view>
 
-
-<block wx:for="{{photos}}" wx:key="preview">
-  <view style="display:flex; justify-content:center; align-items:center;">
-    <image bindtap='previewImage' data-src="{{item.original}}" mode="widthFix" src="{{item.preview}}" style="width: 90%;">
-    </image>
-  </view>
-  <view class="legend">
-    {{item.legend}}
-  </view>
-  <text> \n </text>
-</block>
-
-<text> \n </text>
-
-<view style="display:flex; justify-content:center; align-items:center;">
-  <map id="map" bindcontroltap="controltap" bindupdated="includePointsOne" markers="{{markers}}" bindmarkertap="markertap" bindregionchange="regionchange" show-location style="width: 90%; height: 300px;"></map>
+<!-- 加载中 / 加载失败 -->
+<view class="state" wx:if="{{loading}}">
+  <view class="state-text">加载中…</view>
 </view>
-
-<text> \n </text>
+<view class="state" wx:if="{{error}}">
+  <view class="state-text">{{error}}</view>
+</view>
