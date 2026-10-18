@@ -1,3 +1,6 @@
 node_modules/
 miniprogram_npm/
 .DS_Store
+
+# 数据库导出与迁移文件含 _id 和 xsecToken，不进仓库
+*.ndjson

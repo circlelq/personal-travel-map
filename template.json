@@ -1,30 +1,35 @@
 {
   "name": "悉尼",
-  "markers": {
-    "0": {
-      "coordinates": [
-        -33.858611, 151.214167
-      ],
-      "type": "Point"
+  "pinyin": "xini",
+  "alias": ["sydney"],
+  "country": "澳大利亚",
+  "region": "新南威尔士",
+  "visits": ["2025-07-16"],
+  "locations": [
+    {
+      "lat": -33.858611,
+      "lng": 151.214167,
+      "name": "悉尼歌剧院"
     }
-  },
-  "officialAccount": {
+  ],
+  "photos": [
+    {
+      "file": "悉尼歌剧院1",
+      "title": "歌剧院",
+      "date": "2025-07-16"
+    },
+    {
+      "file": "悉尼歌剧院2"
+    },
+    {
+      "file": "悉尼歌剧院3"
+    }
+  ],
+  "links": {
     "bili": "1Bh411C7qN",
     "xhs": {
-      "xsecToken": "ABnGaYYM_GDJKVJydlwQ51qaIZV1ipNjB3gnVurQWs6lo",
-      "id": "67667d5a000000000b017a33"
+      "id": "67667d5a000000000b017a33",
+      "xsecToken": "ABnGaYYM_GDJKVJydlwQ51qaIZV1ipNjB3gnVurQWs6lo"
     }
-  },
-  "pinyin": "2025-07-16",
-  "photo": [
-    [
-      "悉尼歌剧院1"
-    ],
-    [
-      "悉尼歌剧院2"
-    ],
-    [
-      "悉尼歌剧院3"
-    ]
-  ]
+  }
 }
