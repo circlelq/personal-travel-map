@@ -9,6 +9,6 @@
 </view>
 
 <view class="weui-footer" display="flex">
-  <view class="weui-footer__text" align-self="flex-end">v1.0.3</view>
+  <view class="weui-footer__text" align-self="flex-end">v1.1.0</view>
 </view>
 <text> \n </text>
