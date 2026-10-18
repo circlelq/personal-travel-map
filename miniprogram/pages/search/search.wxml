@@ -1,17 +1,27 @@
-<view class="circle">
-  <input class='search' auto-focus placeholder="请输入城市名称" bindconfirm="bindconfirmT" bindinput="bindKeyInput" placeholder-class="placeholder" />
-</view>
-
-<view class="container">
-  <view class="divLineLong"></view>
-</view>
-
-<navigator block wx:for="{{city}}" wx:key="_id" url="/pages/cityDetail/cityDetail?city_id={{item._id}}">
-  <view>
-    <view class="catitem">
-      <image class='avator' lazy-load='true' src="{{item.avatar}}" mode='aspectFill'></image>
-      <view class="cat-name">{{item.name}}</view>
-    </view>
-    <view class="divLine"></view>
+<!-- search.wxml -->
+<view class="page">
+  <view class="searchbar">
+    <input
+      class="searchbar-input"
+      auto-focus
+      value="{{inputValue}}"
+      confirm-type="search"
+      placeholder="搜索城市"
+      placeholder-class="searchbar-placeholder"
+      bindinput="bindKeyInput"
+      bindconfirm="bindconfirmT" />
+    <text class="searchbar-cancel" bindtap="goBack">取消</text>
   </view>
-</navigator>
+
+  <view class="result">
+    <navigator class="item" wx:for="{{city}}" wx:key="_id" url="/pages/cityDetail/cityDetail?city_id={{item._id}}">
+      <image class="item-cover" src="{{item.cover}}" mode="aspectFill" lazy-load="true"></image>
+      <view class="item-body">
+        <view class="item-name">{{item.name}}</view>
+        <view class="item-meta">{{item.photoCount}} 张照片</view>
+      </view>
+    </navigator>
+
+    <view class="empty" wx:if="{{emptyText}}">{{emptyText}}</view>
+  </view>
+</view>

@@ -114,26 +114,4 @@ Page({
       }
     }
   },
-
-  // 搜索栏输入名字后页面跳转
-  bindconfirmT: function (e) {
-    const keyword = (e.detail.value || '').trim();
-    if (!keyword) return;
-
-    app.mpServerless.db.collection('city').find({
-      name: keyword
-    }, {}).then(res => {
-      const city = res.result && res.result[0];
-      if (!city) {
-        wx.showToast({
-          title: '没有找到该城市',
-          icon: 'none',
-        });
-        return;
-      }
-      wx.navigateTo({
-        url: '/pages/cityDetail/cityDetail?city_id=' + city._id,
-      })
-    }).catch(console.error);
-  },
 })

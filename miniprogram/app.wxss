@@ -1,37 +1,13 @@
 /**app.wxss**/
-.container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+page {
+  /* 全局设计变量：主色与文字色，改配色只改这里 */
+  --brand: #557e56;
+  --text-primary: #2c2c2a;
+  --text-secondary: #8a8a8a;
+  --page-bg: #f7f8f7;
 }
 
-.itemname1 {
-  font-size: 27rpx;
-  margin-left: 40rpx;
-  margin-bottom: 30rpx;
-  margin-top: 30rpx;
-  display: flex;
-  color: #888888;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-}
-
-.itemname2 {
-  font-size: 30rpx;
-  color: #353535;
-  font-weight: normal;
-  margin-right: 40rpx;
-  margin-bottom: 30rpx;
-}
-
-
-.content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
+/* 详情页城市名 */
 .title {
   font-size: 45rpx;
   text-align: center;
@@ -40,118 +16,16 @@
   font-weight: bold;
 }
 
-.head1 {
-  font-size: 37rpx;
+/* 详情页 B 站、小红书入口行 */
+.itemname1 {
+  font-size: 27rpx;
   margin-left: 40rpx;
   margin-right: 40rpx;
-  line-height: 25rpx;
-  margin-bottom: 25rpx;
-  margin-top: 70rpx;
-  font-weight: bold;
-  color: black;
-  text-align: left;
-}
-
-.body {
-  font-size: 32rpx;
-  margin-left: 40rpx;
-  margin-right: 40rpx;
-  margin-bottom: 25rpx;
-  margin-top: 25rpx;
-  color: #353535;
-  letter-spacing: 5rpx;
-  line-height: 50rpx;
-  text-align: justify;
-}
-
-.bodybold {
-  font-weight: bold;
-}
-
-/* 会徽 */
-.board image {
-  width: 100%;
-  height: 300rpx;
-  border-bottom: 1rpx solid #eee;
-}
-
-.circle {
-  height: 150rpx;
-  /* margin-top: 30rpx;
-  margin-bottom: 30rpx; */
+  margin-bottom: 30rpx;
+  margin-top: 30rpx;
   display: flex;
-  align-items: center;
-  width: 100%;
-}
-
-/*每一只猫*/
-.catitem {
-  height: 110rpx;
-  /* margin-top: 30rpx;
-  margin-bottom: 30rpx; */
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-
-/*分割线样式*/
-.divLine {
-  background: #eee;
-  height: 3rpx;
-  margin-left: 150rpx;
-}
-
-/*长分割线样式*/
-.divLineLong {
-  background: #eee;
-  height: 3rpx;
-  margin-left: 40rpx;
-}
-
-/*猫名称*/
-.cat-name {
-  font-size: 32rpx;
-  flex-direction: row;
-  margin-left: 150rpx;
-  color: #353535;
-  text-align: center;
-}
-
-.avator {
-  width: 80rpx;
-  height: 80rpx;
-  margin-left: 40rpx;
-  position: absolute;
-  align-items: center;
-  display: flex;
-}
-
-.copy {
-  color: #576b95;
-  font-weight: bold;
-}
-
-.play {
-  width: 45rpx;
-  height: 45rpx;
-  margin-right: 20rpx;
-}
-
-.cat_image {
-  border-radius: 10rpx;
-  overflow: hidden;
-}
-
-.cat-card {
-  font-size: 45rpx;
-  color: black;
-  font-weight: bold;
-  justify-content: flex-start;
-}
-
-.sound {
-  margin-top: 9rpx;
-  display: flex;
+  color: #888888;
   flex-direction: row;
   flex-wrap: wrap;
+  justify-content: flex-start;
 }

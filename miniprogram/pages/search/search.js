@@ -1,7 +1,20 @@
 const app = getApp();
 
-// COS 头像目录，城市名需要 URL 编码后拼接
+// COS 目录，城市名与照片名都需要 URL 编码后拼接
 const COS_AVATAR = 'https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E5%A4%B4%E5%83%8F/';
+const COS_PREVIEW = 'https://city-1257850266.cos.ap-guangzhou.myqcloud.com/%E9%A2%84%E8%A7%88%E5%9B%BE/';
+
+// 列表项封面：首张照片，没有照片的城市用头像兜底
+function buildCover(item) {
+  const nameEncoded = encodeURIComponent(item.name);
+  const photos = item.photo || [];
+  return Object.assign({}, item, {
+    cover: photos.length
+      ? COS_PREVIEW + nameEncoded + '/' + encodeURIComponent(photos[0][0]) + '.jpg'
+      : COS_AVATAR + nameEncoded + '.png',
+    photoCount: photos.length,
+  });
+}
 
 // 把关键字拆成单字，字与字之间允许任意字符，实现「模糊顺序匹配」
 function buildPattern(keyword) {
@@ -12,6 +25,7 @@ Page({
   data: {
     city: [],
     inputValue: "",
+    emptyText: "输入城市名称开始搜索",
   },
 
   /**
@@ -29,7 +43,8 @@ Page({
     const keyword = (this.data.inputValue || '').trim();
     if (!keyword) {
       this.setData({
-        city: []
+        city: [],
+        emptyText: "输入城市名称开始搜索"
       });
       return;
     }
@@ -41,11 +56,10 @@ Page({
       }
     };
     const render = res => {
-      const data = (res.result || []).map(item => Object.assign({}, item, {
-        avatar: COS_AVATAR + encodeURIComponent(item.name) + '.png',
-      }));
+      const data = (res.result || []).map(buildCover);
       this.setData({
-        city: data
+        city: data,
+        emptyText: data.length ? "" : "没有找到相关城市"
       });
     };
 
@@ -61,6 +75,17 @@ Page({
           $regex: pattern
         }
       }, options).then(render).catch(console.error);
+    });
+  },
+
+  // 取消：返回上一页，从分享链接直接进来时回首页
+  goBack() {
+    wx.navigateBack({
+      fail: () => {
+        wx.switchTab({
+          url: '/pages/index/index',
+        });
+      }
     });
   },
 
