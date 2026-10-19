@@ -117,8 +117,10 @@ Page({
     app.mpServerless.db.collection('city').find({
       name: keyword
     }, {}).then(res => {
-      const city = res.result && res.result[0];
-      if (!city) {
+      // 必须过一遍 normalizeCity：库里的 _id 是 {$oid} 形式，
+      // 直接拼进 URL 会变成 [object Object]，详情页就查不到城市了
+      const city = normalizeCity(res.result && res.result[0]);
+      if (!city || !city._id) {
         wx.showToast({
           title: '没有找到该城市',
           icon: 'none',
