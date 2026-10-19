@@ -9,6 +9,13 @@ import {
   fallbackCoverUrl,
 } from '../../utils/city';
 
+// 地图卡片的最小可视跨度（公里）：标记点少时也要留出城市尺度的视野，
+// 否则 includePoints 会把镜头怼到最大级别，只剩一个图钉看不出是哪
+const MIN_VIEW_KM = 22;
+
+// 纬度每度对应的地面距离（公里）
+const KM_PER_DEGREE = 111.32;
+
 Page({
   data: {
     loading: true,
@@ -90,7 +97,7 @@ Page({
         subtitle: buildSubtitle(city),
         stats: buildStats(city),
       }, () => {
-        this.includePointsOne();
+        this.includePointsOne(false);
       });
     }).catch(err => {
       console.error(err);
@@ -127,14 +134,21 @@ Page({
     });
   },
 
-  includePointsOne() {
-    if (!this.data.markers.length) return;
+  // fromUpdate：来自 map 的 updated 事件，说明地图确实渲染好了，
+  // 这次之后就锁定视野，用户手动缩放/拖动时不再被拉回去
+  includePointsOne(fromUpdate) {
+    if (this._mapFitted || !this.data.markers.length) return;
+    if (fromUpdate) this._mapFitted = true;
 
     const mapCtx = wx.createMapContext('map', this);
     mapCtx.includePoints({
-      padding: [60, 36, 0, 36],
-      points: this.data.markers,
+      padding: [56, 28, 28, 28],
+      points: buildViewPoints(this.data.markers, MIN_VIEW_KM),
     });
+  },
+
+  onMapUpdated() {
+    this.includePointsOne(true);
   },
 
   // 点击标记：用微信内置地图打开该位置
@@ -200,6 +214,40 @@ Page({
     });
   },
 })
+
+// 把标记点的外接矩形撑到至少 minKm 见方，返回给 includePoints 用的对角两点
+function buildViewPoints(markers, minKm) {
+  const lats = [];
+  const lngs = [];
+  markers.forEach(item => {
+    const lat = Number(item.latitude);
+    const lng = Number(item.longitude);
+    if (isNaN(lat) || isNaN(lng)) return;
+    lats.push(lat);
+    lngs.push(lng);
+  });
+  if (!lats.length) return markers;
+
+  const minLat = Math.min.apply(null, lats);
+  const maxLat = Math.max.apply(null, lats);
+  const minLng = Math.min.apply(null, lngs);
+  const maxLng = Math.max.apply(null, lngs);
+  const centerLat = (minLat + maxLat) / 2;
+  const centerLng = (minLng + maxLng) / 2;
+
+  // 经度每度的距离随纬度收窄，高纬度城市要按比例放宽
+  const cos = Math.max(Math.cos(centerLat * Math.PI / 180), 0.2);
+  const halfLat = Math.max((maxLat - minLat) / 2, minKm / 2 / KM_PER_DEGREE);
+  const halfLng = Math.max((maxLng - minLng) / 2, minKm / 2 / (KM_PER_DEGREE * cos));
+
+  return [{
+    latitude: centerLat - halfLat,
+    longitude: centerLng - halfLng,
+  }, {
+    latitude: centerLat + halfLat,
+    longitude: centerLng + halfLng,
+  }];
+}
 
 // 封面下方的一行说明：所在地、最近到访、到访次数
 function buildSubtitle(city) {

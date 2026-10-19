@@ -61,7 +61,7 @@
         class="city-map"
         markers="{{markers}}"
         bindmarkertap="markertap"
-        bindupdated="includePointsOne"
+        bindupdated="onMapUpdated"
         show-location
       ></map>
     </view>

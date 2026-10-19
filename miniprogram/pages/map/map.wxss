@@ -8,28 +8,47 @@ page {
 }
 
 .map-wrap {
-  position: relative;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100vh;
   overflow: hidden;
 }
 
-.map {
-  width: 100%;
-  height: 100%;
-}
-
-/* 左上角足迹统计 */
-.stat {
-  position: absolute;
-  left: 24rpx;
-  top: 24rpx;
+/* 顶部统计，独立于地图之外 */
+.topbar {
+  flex: none;
   display: flex;
   align-items: baseline;
-  padding: 12rpx 24rpx;
-  background: var(--surface);
-  border-radius: 999rpx;
-  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.1);
+  justify-content: space-between;
+  padding: 18rpx 28rpx;
+  background: #ffffff;
+}
+
+.stat {
+  display: flex;
+  align-items: baseline;
+}
+
+.topbar-tip {
+  font-size: 24rpx;
+  color: var(--text-secondary);
+}
+
+.map-holder {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.map {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .stat-num {
