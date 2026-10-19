@@ -33,8 +33,5 @@
       }
     ]
   },
-  "lazyCodeLoading": "requiredComponents",
-  "useExtendedLib": {
-    "weui": true
-  }
+  "lazyCodeLoading": "requiredComponents"
 }

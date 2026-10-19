@@ -1,11 +1,8 @@
 /* pages/about/about.wxss */
+/* 主色与文字色定义在 app.wxss，这里只补本页独有的分隔线色 */
 page {
-  /* 与地图页保持一致的主色与文字色 */
-  --brand: #557e56;
-  --text-primary: #2c2c2a;
-  --text-secondary: #8a8a8a;
   --divider: #f0f0f0;
-  background: #f7f8f7;
+  background: var(--page-bg);
 }
 
 .about {
@@ -33,14 +30,6 @@ page {
   font-size: 40rpx;
   font-weight: 600;
   color: var(--text-primary);
-}
-
-.hero-desc {
-  margin-top: 12rpx;
-  font-size: 26rpx;
-  line-height: 40rpx;
-  color: var(--text-secondary);
-  text-align: center;
 }
 
 /* 卡片 */

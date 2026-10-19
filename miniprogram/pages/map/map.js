@@ -103,10 +103,6 @@ Page({
     }
   },
 
-  regionchange(e) {
-    // 视角变化不处理，避免移动地图后卡片被误收起
-  },
-
   goDetail() {
     const selected = this.data.selected;
     if (!selected) return;
@@ -160,35 +156,18 @@ Page({
   },
 
   //转发功能
-  onShareAppMessage: function (res) {
-    if (res && res.from === 'button') {
-      // 来自页面内转发按钮
-      console.log(res.target)
-    }
+  onShareAppMessage: function () {
     return {
       title: 'circle 的旅行地图',
-      path: '/pages/map/map', // 路径，传递参数到指定页面。
-      success: function (res) {}
+      path: '/pages/map/map',
     }
   },
 
   // 转发到朋友圈
-  onShareTimeline: function (res) {
-    if (res && res.from === 'button') {
-      // 来自页面内转发按钮
-      console.log(res.target)
-    }
+  onShareTimeline: function () {
     return {
       title: 'circle 的旅行地图',
-      path: '/pages/map/map', // 路径，传递参数到指定页面。
-      success: function (res) {
-        // 转发成功
-        console.log("转发成功:" + JSON.stringify(res));
-      },
-      fail: function (res) {
-        // 转发失败
-        console.log("转发失败:" + JSON.stringify(res));
-      }
+      path: '/pages/map/map',
     }
   }
 })

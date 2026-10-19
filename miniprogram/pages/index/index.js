@@ -9,7 +9,6 @@ import {
 
 Page({
   data: {
-    city: [],
     columns: [[], []],
   },
 
@@ -45,9 +44,7 @@ Page({
 
       data.sort(compareByLastVisit);
 
-      this.setData({
-        city: data
-      });
+      // 只把排版需要的 columns 推给视图层，源数据留在逻辑层
       this.appendToWaterfall(data);
     }).catch(console.error);
   },
@@ -80,38 +77,18 @@ Page({
   },
 
   //转发此页面的设置
-  onShareAppMessage: function (res) {
-    if (res && res.from === 'button') {
-      // 来自页面内转发按钮
-      console.log(res.target)
-    }
+  onShareAppMessage: function () {
     return {
       title: 'circle 的旅行地图',
-      path: '/pages/index/index', // 路径，传递参数到指定页面。
-      success: function (res) {
-        console.log("转发成功:" + JSON.stringify(res));
-      },
-      fail: function (res) {
-        console.log("转发失败:" + JSON.stringify(res));
-      }
+      path: '/pages/index/index',
     }
   },
 
   // 转发到朋友圈
-  onShareTimeline: function (res) {
-    if (res && res.from === 'button') {
-      // 来自页面内转发按钮
-      console.log(res.target)
-    }
+  onShareTimeline: function () {
     return {
       title: 'circle 的旅行地图',
-      path: '/pages/index/index', // 路径，传递参数到指定页面。
-      success: function (res) {
-        console.log("转发成功:" + JSON.stringify(res));
-      },
-      fail: function (res) {
-        console.log("转发失败:" + JSON.stringify(res));
-      }
+      path: '/pages/index/index',
     }
   },
 })

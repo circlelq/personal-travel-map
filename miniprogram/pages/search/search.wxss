@@ -1,9 +1,7 @@
 /* pages/search/search.wxss */
+/* 设计变量统一定义在 app.wxss */
 page {
-  --brand: #557e56;
-  --text-primary: #2c2c2a;
-  --text-secondary: #8a8a8a;
-  background: #f7f8f7;
+  background: var(--page-bg);
 }
 
 .page {

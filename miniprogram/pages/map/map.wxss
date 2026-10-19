@@ -1,8 +1,5 @@
+/* 主色与文字色定义在 app.wxss，这里只补本页独有的浮层底色 */
 page {
-  /* 与 tabBar 主色保持一致，改色只改这里 */
-  --brand: #557e56;
-  --text-primary: #2c2c2a;
-  --text-secondary: #8a8a8a;
   --surface: rgba(255, 255, 255, 0.94);
   height: 100%;
 }

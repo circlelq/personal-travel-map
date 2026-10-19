@@ -166,22 +166,14 @@ Page({
     });
   },
 
-  onShareAppMessage: function (res) {
-    if (res && res.from === 'button') {
-      // 来自页面内转发按钮
-      console.log(res.target)
-    }
+  onShareAppMessage: function () {
     return {
       title: this.data.city.name,
       path: '/pages/cityDetail/cityDetail?city_id=' + this.data.city._id,
     }
   },
 
-  onShareTimeline: function (res) {
-    if (res && res.from === 'button') {
-      // 来自页面内转发按钮
-      console.log(res.target)
-    }
+  onShareTimeline: function () {
     return {
       title: this.data.city.name,
       path: '/pages/cityDetail/cityDetail?city_id=' + this.data.city._id,

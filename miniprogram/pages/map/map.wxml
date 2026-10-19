@@ -25,8 +25,7 @@
       enable-rotate
       enable-overlooking
       bindmarkertap="markertap"
-      bindtap="tapMap"
-      bindregionchange="regionchange">
+      bindtap="tapMap">
     </map>
 
     <!-- 右下角控件 -->
