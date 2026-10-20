@@ -19,8 +19,9 @@ const ADMINS = 'admins';
 const ADMIN_USER_IDS = [];
 
 // admins 集合还是空的时候，允许第一个调用者自动登记为管理员。
-// 一旦有人登记成功，这条就永久失效了。确认自己登记好后建议改成 false。
-const ALLOW_FIRST_CLAIM = true;
+// 首次部署靠它拿到管理员身份；登记完成后已关掉，避免哪天集合被清空时
+// 被陌生人抢占。要重新开这个窗口，把它改回 true 再部署一次即可。
+const ALLOW_FIRST_CLAIM = false;
 
 const MAX_PHOTOS = 200;
 const MAX_FILE_LEN = 120;
