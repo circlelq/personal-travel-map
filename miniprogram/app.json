@@ -4,6 +4,7 @@
     "pages/search/search",
     "pages/about/about",
     "pages/cityDetail/cityDetail",
+    "pages/cityEdit/cityEdit",
     "pages/map/map"
   ],
   "window": {

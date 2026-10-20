@@ -31,6 +31,13 @@ page {
   color: #999999;
 }
 
+/* 长按入口是隐藏手势，用一行小字提示，避免完全发现不了 */
+.edit-hint {
+  margin: 16rpx 4rpx 0;
+  font-size: 22rpx;
+  color: var(--text-secondary);
+}
+
 /* 瀑布流：两列等宽，卡片高度由图片自身比例决定 */
 .waterfall {
   display: flex;
@@ -52,6 +59,11 @@ page {
   background: #ffffff;
   border-radius: 16rpx;
   overflow: hidden;
+}
+
+/* 长按或者点到，给一点可见反馈 */
+.card-hover {
+  opacity: 0.86;
 }
 
 .card-cover {

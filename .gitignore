@@ -4,3 +4,6 @@ miniprogram_npm/
 
 # 数据库导出与迁移文件含 _id 和 xsecToken，不进仓库
 *.ndjson
+
+# 云函数部署用的打包产物，由 server/<函数名> 现场打，不进仓库
+server/*.zip

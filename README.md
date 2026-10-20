@@ -12,14 +12,15 @@
 | 地图 | 足迹打点聚合，点击标记浮出城市卡片，支持比例尺、指南针与回到定位 |
 | 搜索 | 中文按城市名模糊匹配，拼音 / 别名按前缀匹配，结果以封面卡片呈现 |
 | 城市详情 | 照片与图注、B 站 / 小红书跳转、位置地图 |
+| 照片编辑 | 长按首页卡片进入，逐张修改照片名称与日期 |
 | 关于 | 联系方式、版本与开源仓库入口 |
 
 ## 技术栈
 
 - 原生小程序，基础库 3.10.2
-- 阿里云 EMAS Serverless（`@alicloud/mpserverless-sdk`），使用其中的 `city` 集合
+- 阿里云 EMAS Serverless（`@alicloud/mpserverless-sdk`），使用其中的 `city` 集合，
+  写操作经云函数 `updateCityPhotos` 鉴权
 - 腾讯云 COS 存放图片（广州，桶 `city-1257850266`）
-- WeUI 扩展库
 
 ## 目录结构
 
@@ -35,10 +36,13 @@ miniprogram/
     ├── map/           足迹地图
     ├── search/        搜索
     ├── cityDetail/    城市详情
+    ├── cityEdit/      照片编辑（名称与日期）
     └── about/         关于
 template.json          新增城市的字段模板
 scripts/
 └── migrate-city.js    旧格式数据迁移到新格式
+server/
+└── updateCityPhotos/  云函数：照片写入与管理员鉴权
 changeLog.md           版本记录
 ```
 
@@ -67,6 +71,23 @@ changeLog.md           版本记录
 
 新增一座城市：按 `template.json` 填好字段，把对应图片传到 COS，再把记录写进 `city` 集合。
 城市同名封面缺失时，首页会自动回落到该城市的第一张照片。
+
+### 在小程序里编辑照片
+
+长按首页任意城市卡片即可进入编辑页，逐张修改照片的 `title`（名称）与 `date`（日期），
+保存后写回 `city` 集合。名称或日期留空时，详情页不再显示该项。编辑页只改这两个字段，
+`file` 必须保持和 COS 上的文件名一致，因此不开放修改。
+
+### 编辑权限
+
+编辑只对管理员开放，判定在云函数里做，不在客户端：
+
+- `city` 集合的权限是 `{".read": true, ".write": false}`，**客户端只读**。
+- 写操作走云函数 `server/updateCityPhotos`，它先用 `ctx.mpserverless.user.getInfo()`
+  取出调用者的 `userId`，比对管理员名单后才写库。云函数里的数据库操作不受权限规则限制。
+- 首页会先问一次云函数「我是不是管理员」，不是就完全不显示编辑入口。
+
+部署与管理员登记的步骤见 [server/README.md](server/README.md)。
 
 ### 从旧格式迁移
 

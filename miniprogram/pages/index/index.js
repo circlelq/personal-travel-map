@@ -6,15 +6,20 @@ import {
   coverUrl,
   fallbackCoverUrl,
 } from '../../utils/city';
+import { checkAdmin } from '../../utils/admin';
 
 Page({
   data: {
     columns: [[], []],
+    // 编辑只对管理员开放，身份由云函数判定，默认隐藏入口
+    canEdit: false,
   },
 
   // 排版用的内部状态，不进 data，避免无谓的视图层通信
   _columns: [[], []],
   _count: 0,
+  // 从编辑页返回后置为 true，触发一次重新拉取
+  _needReload: false,
 
   /**
    * 生命周期函数--监听页面加载
@@ -25,6 +30,30 @@ Page({
         url: '/pages/cityDetail/cityDetail?city_id=' + options.pageId,
       })
     }
+    this.loadCity();
+    this.checkCanEdit();
+  },
+
+  // 问一次云函数「我是不是管理员」，不是就不显示编辑入口。
+  // 判定放在服务端，客户端改数据也骗不过去
+  checkCanEdit() {
+    checkAdmin().then(body => {
+      this.setData({
+        canEdit: !!body.isAdmin,
+      });
+    }).catch(err => {
+      // 调用失败时保持隐藏，不影响浏览，原因打到控制台
+      console.error('查询编辑权限失败', err);
+    });
+  },
+
+  onShow: function () {
+    // 编辑页改完照片后返回，瀑布流要反映最新数据
+    if (!this._needReload) return;
+
+    this._needReload = false;
+    this._columns = [[], []];
+    this._count = 0;
     this.loadCity();
   },
 
@@ -60,6 +89,34 @@ Page({
 
     this.setData({
       columns: [this._columns[0].slice(), this._columns[1].slice()]
+    });
+  },
+
+  goDetail(e) {
+    const id = e.currentTarget.dataset.id;
+    if (!id) return;
+
+    wx.navigateTo({
+      url: '/pages/cityDetail/cityDetail?city_id=' + id,
+    });
+  },
+
+  // 长按卡片进入编辑页，改这座城市照片的名称和日期。
+  // 先震一下，让人知道长按已经生效，不会误以为是卡住了
+  goEdit(e) {
+    if (!this.data.canEdit) return;
+
+    const id = e.currentTarget.dataset.id;
+    if (!id) return;
+
+    wx.vibrateShort({
+      type: 'medium',
+      fail: () => {},
+    });
+    this._needReload = true;
+
+    wx.navigateTo({
+      url: '/pages/cityEdit/cityEdit?city_id=' + id,
     });
   },
 

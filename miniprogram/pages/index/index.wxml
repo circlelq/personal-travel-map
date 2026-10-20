@@ -5,9 +5,21 @@
     <text class="searchbar-text">搜索城市</text>
   </navigator>
 
+  <view class="edit-hint" wx:if="{{canEdit}}">长按卡片可以编辑这座城市的照片信息</view>
+
   <view class="waterfall">
     <view class="waterfall-col" wx:for="{{columns}}" wx:for-item="column" wx:for-index="colIndex" wx:key="colIndex">
-      <navigator class="card" wx:for="{{column}}" wx:for-item="item" wx:key="_id" url="/pages/cityDetail/cityDetail?city_id={{item._id}}">
+      <view
+        class="card"
+        hover-class="card-hover"
+        hover-stay-time="80"
+        wx:for="{{column}}"
+        wx:for-item="item"
+        wx:key="_id"
+        data-id="{{item._id}}"
+        bindtap="goDetail"
+        bindlongpress="goEdit"
+      >
         <image
           class="card-cover"
           src="{{item.cover}}"
@@ -22,7 +34,7 @@
           <view class="card-title">{{item.name}}</view>
           <view class="card-meta" wx:if="{{item.photoCount}}">{{item.photoCount}} 张照片</view>
         </view>
-      </navigator>
+      </view>
     </view>
   </view>
 </view>

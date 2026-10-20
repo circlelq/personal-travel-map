@@ -22,13 +22,15 @@ App({
       menus: ['shareAppMessage', 'shareTimeline'],
     });
 
-    try {
-      await mpServerless.user.authorize({
-        authProvider: 'wechat_openapi',
-      });
-    } catch (err) {
+    // 页面不会等 onLaunch 结束才加载，把授权的 promise 挂到全局，
+    // 需要发请求的地方先等它，否则云函数拿不到调用者身份
+    this.authReady = mpServerless.user.authorize({
+      authProvider: 'wechat_openapi',
+    }).catch(err => {
       console.error('mpserverless 授权失败', err);
-    }
+    });
+
+    await this.authReady;
   },
 
   // 检查并应用小程序版本更新
