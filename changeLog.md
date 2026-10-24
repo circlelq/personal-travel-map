@@ -1,5 +1,18 @@
 # Change Log
 
+## 1.4.0
+
+1. 后端从阿里云 EMAS Serverless 迁到微信云开发。
+2. 新增 `utils/db.js` 作为统一数据访问层：循环分页绕开小程序端单次最多读 20 条的限制，
+   查询条件的构造（正则用 `db.RegExp`、或查询用 `_.or`）集中在一处翻译。
+3. 去掉 `@alicloud/mpserverless-sdk` 依赖与打包产物，包体积约小 400KB；前端不再需要构建 npm。
+4. 鉴权改用 `cloud.getWXContext().OPENID`：小程序端调用自带身份，不需要客户端显式登录。
+5. 管理员不再走 `admins` 集合登记，openid 直接写在云函数白名单里，
+   省掉首次登记的一次部署，也没有被陌生人抢占的窗口期。
+6. 补充云函数的 `EDIT_TOKEN` 通道，网页版等非小程序端可复用同一套写入逻辑。
+7. 数据迁移脚本 `scripts/emas-to-cloudbase.js`：把 EMAS 导出的数据摊平 `$oid` / `$date`，
+   转成云开发控制台能直接导入的 JSON Lines。
+
 ## 1.3.0
 
 1. 新增照片编辑页：长按首页城市卡片进入，可逐张修改照片的名称与日期。

@@ -18,18 +18,20 @@
 ## 技术栈
 
 - 原生小程序，基础库 3.10.2
-- 阿里云 EMAS Serverless（`@alicloud/mpserverless-sdk`），使用其中的 `city` 集合，
-  写操作经云函数 `updateCityPhotos` 鉴权
+- 微信云开发（`wx.cloud`），使用 `city` 集合，写操作经云函数 `updateCityPhotos` 鉴权
 - 腾讯云 COS 存放图片（广州，桶 `city-1257850266`）
 
 ## 目录结构
 
 ```
 miniprogram/
-├── app.js             SDK 初始化与全局逻辑
+├── app.js             wx.cloud 初始化与全局逻辑
 ├── app.json           页面注册与 tabBar
 ├── app.wxss           全局设计变量
+├── cloudfunctions/
+│   └── updateCityPhotos/  云函数：照片写入与管理员鉴权
 ├── utils/
+│   ├── db.js          数据访问层：分页拉全量与查询条件构造
 │   └── city.js        文档归一化与 COS 图片地址
 └── pages/
     ├── index/         城市列表
@@ -40,10 +42,9 @@ miniprogram/
     └── about/         关于
 template.json          新增城市的字段模板
 scripts/
-└── migrate-city.js    旧格式数据迁移到新格式
-server/
-└── updateCityPhotos/  云函数：照片写入与管理员鉴权
-changeLog.md           版本记录
+├── emas-to-cloudbase.js   EMAS 数据转成云开发能导入的 JSON Lines
+└── migrate-city.js        旧格式数据迁移到新格式
+changeLog.md               版本记录
 ```
 
 ## 数据模型
@@ -82,12 +83,14 @@ changeLog.md           版本记录
 
 编辑只对管理员开放，判定在云函数里做，不在客户端：
 
-- `city` 集合的权限是 `{".read": true, ".write": false}`，**客户端只读**。
-- 写操作走云函数 `server/updateCityPhotos`，它先用 `ctx.mpserverless.user.getInfo()`
-  取出调用者的 `userId`，比对管理员名单后才写库。云函数里的数据库操作不受权限规则限制。
+- `city` 集合的权限是「所有用户可读，仅创建者可写」，客户端直连只读，写一律经云函数
+- 写操作走云函数 `cloudfunctions/updateCityPhotos`，它用 `cloud.getWXContext().OPENID`
+  取出调用者身份，比对云函数内的 `ADMIN_USER_IDS` 白名单后才写库。
+  云函数里的数据库操作走管理端权限，不受集合权限规则限制。
 - 首页会先问一次云函数「我是不是管理员」，不是就完全不显示编辑入口。
 
-部署与管理员登记的步骤见 [server/README.md](server/README.md)。
+拿到自己 openid 的办法：小程序启动后控制台会打印一行 `云开发身份 xxx isAdmin: false`，
+那串 `xxx` 就是要填进 `ADMIN_USER_IDS` 的值。同一小程序下 openid 固定，换手机不用重配。
 
 ### 从旧格式迁移
 
@@ -107,8 +110,31 @@ changeLog.md           版本记录
 ## 本地运行
 
 1. 微信开发者工具导入 `miniprogram` 目录
-2. 在工具里执行「构建 npm」，生成 `miniprogram_npm`
-3. 把 `app.js` 里的 `spaceId` 与 `clientSecret` 换成自己的服务空间凭证
+2. 把 `app.js` 里的 `CLOUD_ENV` 换成自己的云开发环境 ID
+3. 右键 `cloudfunctions` 目录 → 「选择想要上传的目标环境」，绑定同一个环境
+4. 右键 `cloudfunctions/updateCityPhotos` → 「上传并部署：云端安装依赖」
+
+前端已无 npm 依赖，不需要再执行「构建 npm」。
+
+## 数据导入
+
+云开发控制台导入功能有两个硬性要求，缺一个就会被拒：
+
+1. 文件后缀必须是 `.json` 或 `.csv`（`.jsonl` 不行）
+2. 内容是 **JSON Lines**：每行一个独立对象，不是 JSON 数组
+
+另外，导入会先把文件传到云存储，所以环境里至少要有一个 Bucket，
+否则会报 `No available bucket. Please create a bucket in Storage.`。
+
+从 EMAS 迁过来的数据先用脚本摊平 `{$oid}` / `{$date}`（云开发要求 `_id` 是纯字符串，
+嵌套对象会导致详情页路径变成 `[object Object]`）：
+
+```bash
+node scripts/emas-to-cloudbase.js <EMAS导出文件> -c city -o cloudbase-import
+```
+
+如果控制台始终导不进去，可以临时写一个云函数，把数据内联在函数里调用 `add()` 直接写库。
+云函数走管理端权限，不经过云存储，也不受导入格式限制，用完删掉即可。
 
 ## 更新日志
 
