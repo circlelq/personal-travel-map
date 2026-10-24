@@ -24,10 +24,10 @@ const db = cloud.database();
 const CITY = 'city';
 const ADMINS = 'admins';
 
-// 也可以直接把 openid 写死在这里，优先级高于 admins 集合。
-// 拿自己 openid 的办法：把 ALLOW_FIRST_CLAIM 打开，用你自己的微信保存一次，
-// 被拒绝时返回的 userId 字段就是；或者让它自动登记成功也行。
-const ADMIN_USER_IDS = [];
+// 写死的 openid，优先级高于 admins 集合。
+// 拿自己 openid 的办法：小程序启动后首页会打印一行「云开发身份 xxx」，
+// 那串 xxx 就是。换手机/换微信号都不会变（同一小程序下 openid 唯一）。
+const ADMIN_USER_IDS = ['oFCT06yM-bPKJJ-tAdIJIsKziI20'];
 
 // admins 集合还是空的时候，允许第一个调用者自动登记为管理员。
 // 首次部署靠它拿到管理员身份，登记完成后关掉，避免集合被清空时被陌生人抢占。
