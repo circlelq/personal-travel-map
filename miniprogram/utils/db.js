@@ -29,7 +29,11 @@ export async function fetchAllCities() {
   const all = [];
 
   for (let page = 0; page < MAX_PAGES; page++) {
+    // 必须固定排序，否则不写 orderBy 时底层返回顺序不保证稳定，
+    // skip 分页会重复或漏掉记录。首页的展示顺序由客户端排序决定，
+    // 这里的排序只用来保证分页不重不漏
     const res = await collection()
+      .orderBy('_id', 'asc')
       .skip(page * PAGE_SIZE)
       .limit(PAGE_SIZE)
       .get();
@@ -61,20 +65,29 @@ export async function fetchCityByName(name) {
   return (res && res.data) || [];
 }
 
-// 关键词搜索。buildCityQueries 会给出几组候选条件，
-// 用第一组「能查通」的即可，哪组先成功就用哪组的结果
+// 关键词搜索。buildCityQueries 会给出几组候选条件，逐个试：
+// 查询报错或结果为空都换下一组，直到某一组真的查到东西
 export async function searchCities(keyword) {
   const queries = buildCityQueries(keyword);
+  let lastError = null;
 
   for (const query of queries) {
     const where = buildWhere(query);
     if (!where) continue;
 
-    const res = await collection().where(where).limit(PAGE_SIZE).get();
-    return (res && res.data) || [];
+    try {
+      const res = await collection().where(where).limit(PAGE_SIZE).get();
+      const list = (res && res.data) || [];
+      if (list.length) return list;
+    } catch (err) {
+      // 比如基础库不支持某个正则选项，换下一种写法再试
+      lastError = err;
+      console.error('搜索条件不可用，尝试下一种', err);
+    }
   }
 
-  throw new Error('没有可用的查询条件');
+  if (lastError) throw lastError;
+  return [];
 }
 
 // 把 city.js 给出的查询描述翻译成云开发的 where 条件
