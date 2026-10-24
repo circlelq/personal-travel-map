@@ -10,9 +10,12 @@
 //   1) 标准 JSON 数组：[{...}, {...}]
 //   2) JSON Lines：每行一个 JSON 对象
 //
-// 输出：每个集合一个 .jsonl 文件，每行一条记录（云开发控制台只认这种格式，
-// 标准 JSON 数组它不认）。单文件超过 --max-bytes（默认 8MB）或 --max-records
-// （默认 1000 条）会自动分片，命名如 city.1.jsonl、city.2.jsonl。
+// 输出：每个集合一个 .json 文件，每行一条记录。云开发控制台对导入文件有两个
+// 硬要求，缺一个就拒绝：
+//   1) 后缀必须是 .json 或 .csv —— 用 .jsonl 会被直接判定为格式不支持
+//   2) 内容是 JSON Lines（每行一个独立对象），不能是 JSON 数组
+// 单文件超过 --max-bytes（默认 8MB）或 --max-records（默认 1000 条）会自动
+// 分片，命名如 city.1.json、city.2.json。
 //
 // 转换规则：
 //   - {$oid: "xxx"} 摊平成 "xxx"。_id 必须是字符串，否则详情页路径会变成
@@ -147,7 +150,7 @@ for (const [name, records] of buckets) {
 
   const flush = () => {
     if (!buffer.length) return;
-    const file = path.join(outDir, name + '.' + part + '.jsonl');
+    const file = path.join(outDir, name + '.' + part + '.json');
     fs.writeFileSync(file, buffer.join('\n') + '\n');
     console.log('写出 ' + file + '（' + buffer.length + ' 条）');
     part++;
@@ -175,6 +178,6 @@ for (const [name, records] of buckets) {
 console.log('\n汇总：');
 console.table(summary);
 console.log('\n输出目录：' + outDir);
-console.log('导入方式：云开发控制台 → 数据库 → 选择集合 → 导入 → 上传 .jsonl 文件');
+console.log('导入方式：云开发控制台 → 数据库 → 选择集合 → 导入 → 文件格式选 JSON → 上传 .json 文件');
 console.log('注意：导入时「冲突处理」选「Insert」，已有 _id 的会原样保留；');
 console.log('      如果提示 _id 冲突，说明该集合里已有同名记录，先清空再导。');

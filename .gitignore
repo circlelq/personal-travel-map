@@ -10,3 +10,6 @@ server/*.zip
 
 # 导入云开发用的临时产物
 cloudbase-import/
+
+# 一次性灌数据的云函数，里面内联了整份城市数据，用完即删、不进仓库
+miniprogram/cloudfunctions/seedCity/
