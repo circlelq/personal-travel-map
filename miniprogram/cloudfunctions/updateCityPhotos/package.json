@@ -1,0 +1,9 @@
+{
+  "name": "updateCityPhotos",
+  "version": "1.0.0",
+  "description": "校验管理员身份后写回城市照片",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

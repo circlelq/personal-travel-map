@@ -1,5 +1,3 @@
-const app = getApp();
-
 import {
   normalizeCity,
   compareByLastVisit,
@@ -7,6 +5,7 @@ import {
   fallbackCoverUrl,
 } from '../../utils/city';
 import { checkAdmin } from '../../utils/admin';
+import { fetchAllCities } from '../../utils/db';
 
 Page({
   data: {
@@ -38,6 +37,10 @@ Page({
   // 判定放在服务端，客户端改数据也骗不过去
   checkCanEdit() {
     checkAdmin().then(body => {
+      // 首次迁移时用这个 openid 填云函数里的 ADMIN_USER_IDS，
+      // 拿到之后可以把这行日志删掉
+      console.info('云开发身份', body.userId, 'isAdmin:', !!body.isAdmin);
+
       this.setData({
         canEdit: !!body.isAdmin,
       });
@@ -57,12 +60,13 @@ Page({
     this.loadCity();
   },
 
-  // 城市数量有限，一次取完，排序放在客户端，省掉对嵌套字段排序的依赖
-  loadCity() {
-    app.mpServerless.db.collection('city').find({}, {
-      limit: 100,
-    }).then(res => {
-      const data = (res.result || [])
+  // 全量取回，排序放在客户端，省掉对嵌套字段排序的依赖。
+  // 分页拉取由 fetchAllCities 内部处理，绕开小程序端单次 20 条的上限
+  async loadCity() {
+    try {
+      const list = await fetchAllCities();
+
+      const data = list
         .map(normalizeCity)
         .filter(Boolean)
         .map(item => Object.assign({}, item, {
@@ -75,7 +79,9 @@ Page({
 
       // 只把排版需要的 columns 推给视图层，源数据留在逻辑层
       this.appendToWaterfall(data);
-    }).catch(console.error);
+    } catch (err) {
+      console.error('加载城市失败', err);
+    }
   },
 
   // 按数据顺序左右交替落列，卡片高度由图片自身比例撑开，不追求两列底部齐平

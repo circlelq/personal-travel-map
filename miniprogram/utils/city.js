@@ -128,36 +128,38 @@ function buildPattern(keyword) {
 
 // 纯拉丁字母时按拼音 / 别名前缀匹配，否则按中文名模糊匹配。
 // 每组按优先级排列，前一个不被服务端接受就用后一个。
+//
+// 这里只产出「查询描述」，不写具体的数据库语法：Mongo 风格的 $regex / $or
+// 和云开发的 db.RegExp / _.or 写法不一样，由 utils/db.js 负责翻译。
+// 好处是这段纯逻辑在小程序和网页版里都能原样复用。
 export function buildCityQueries(keyword) {
   if (/^[a-zA-Z]+$/.test(keyword)) {
-    const prefix = {
-      $regex: '^' + keyword,
-      $options: 'i'
-    };
     return [
+      // 第一选择：拼音或别名任一前缀命中
       {
-        $or: [{
-          pinyin: prefix
-        }, {
-          alias: prefix
-        }]
+        type: 'prefix',
+        prefix: keyword,
       },
+      // 备选：只按拼音前缀，某些环境下 or 查询不被接受
       {
-        pinyin: prefix
+        type: 'regex',
+        field: 'pinyin',
+        pattern: '^' + keyword,
+        options: 'i',
       },
     ];
   }
 
   const pattern = buildPattern(keyword);
   return [{
-    name: {
-      $regex: pattern,
-      $options: 'i'
-    }
+    type: 'regex',
+    field: 'name',
+    pattern: pattern,
+    options: 'i',
   }, {
-    name: {
-      $regex: pattern
-    }
+    type: 'regex',
+    field: 'name',
+    pattern: pattern,
   }];
 }
 

@@ -1,5 +1,3 @@
-const app = getApp();
-
 import {
   normalizeCity,
   previewUrl,
@@ -8,6 +6,7 @@ import {
   fallbackCoverUrl,
 } from '../../utils/city';
 import { updatePhotos } from '../../utils/admin';
+import { fetchCityById } from '../../utils/db';
 
 Page({
   data: {
@@ -44,50 +43,52 @@ Page({
     wx.disableAlertBeforeUnload();
   },
 
-  loadCity(cityId) {
-    app.mpServerless.db.collection('city').find({
-      _id: cityId,
-    }, {}).then(res => {
-      const city = normalizeCity(res.result && res.result[0]);
-      if (!city) {
-        this.setData({
-          loading: false,
-          error: '没有找到该城市',
-        });
-        return;
-      }
-
-      const photos = city.photos.map((item, index) => ({
-        key: 'photo-' + index,
-        file: item.file,
-        preview: previewUrl(city.name, item.file),
-        original: originalUrl(city.name, item.file),
-        // 名称为空时详情页没有说明文字，用文件名当输入框占位提示，
-        // 让人知道这张图对应 COS 上的哪一个文件
-        title: item.title,
-        date: item.date,
-      }));
-
-      this.setData({
-        loading: false,
-        cityId: city._id,
-        cityName: city.name,
-        cover: coverNameUrl(city.name, false),
-        photos: photos,
-        previewUrls: photos.map(item => item.original),
-      });
-      wx.setNavigationBarTitle({
-        title: '编辑 · ' + city.name,
-      });
-
-      this._snapshot = serialize(photos);
-    }).catch(err => {
+  async loadCity(cityId) {
+    let city;
+    try {
+      const list = await fetchCityById(cityId);
+      city = normalizeCity(list[0]);
+    } catch (err) {
       console.error(err);
       this.setData({
         loading: false,
         error: '加载失败，请稍后再试',
       });
+      return;
+    }
+
+    if (!city) {
+      this.setData({
+        loading: false,
+        error: '没有找到该城市',
+      });
+      return;
+    }
+
+    const photos = city.photos.map((item, index) => ({
+      key: 'photo-' + index,
+      file: item.file,
+      preview: previewUrl(city.name, item.file),
+      original: originalUrl(city.name, item.file),
+      // 名称为空时详情页没有说明文字，用文件名当输入框占位提示，
+      // 让人知道这张图对应 COS 上的哪一个文件
+      title: item.title,
+      date: item.date,
+    }));
+
+    this.setData({
+      loading: false,
+      cityId: city._id,
+      cityName: city.name,
+      cover: coverNameUrl(city.name, false),
+      photos: photos,
+      previewUrls: photos.map(item => item.original),
     });
+    wx.setNavigationBarTitle({
+      title: '编辑 · ' + city.name,
+    });
+
+    this._snapshot = serialize(photos);
   },
 
   onTitleInput(e) {
@@ -249,7 +250,7 @@ function showSaveError(err) {
 
   if (code === 'FORBIDDEN') {
     const how = err.userId
-      ? '\n\n你的 userId 是 ' + err.userId + '，把它填进 server/updateCityPhotos/index.js 的 ADMIN_USER_IDS 再重新部署即可。'
+      ? '\n\n你的 openid 是 ' + err.userId + '，把它填进 cloudfunctions/updateCityPhotos/index.js 的 ADMIN_USER_IDS 再重新部署即可。'
       : '';
     wx.showModal({
       title: '没有编辑权限',

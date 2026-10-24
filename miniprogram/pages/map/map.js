@@ -1,7 +1,6 @@
 // map.js
-const app = getApp();
-
 import { normalizeCity, avatarUrl } from '../../utils/city';
+import { fetchAllCities } from '../../utils/db';
 
 Page({
   data: {
@@ -21,11 +20,10 @@ Page({
     this.loadMarkers();
   },
 
-  loadMarkers() {
-    app.mpServerless.db.collection('city').find({}, {
-      limit: 100,
-    }).then(res => {
-      const allCity = (res.result || []).map(normalizeCity).filter(Boolean);
+  async loadMarkers() {
+    try {
+      const list = await fetchAllCities();
+      const allCity = list.map(normalizeCity).filter(Boolean);
       const markers = [];
       let number = 0;
 
@@ -69,7 +67,9 @@ Page({
       }, () => {
         this.resetViewport();
       });
-    }).catch(console.error);
+    } catch (err) {
+      console.error('加载地图数据失败', err);
+    }
   },
 
   // 点击标记：不直接跳走，先浮出底部卡片

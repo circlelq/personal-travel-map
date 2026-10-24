@@ -1,18 +1,7 @@
 //app.js
-import MPServerless from '@alicloud/mpserverless-sdk';
-const mpServerless = new MPServerless({
-  uploadFile: wx.uploadFile,
-  request: wx.request,
-  getAuthCode: wx.login,
-  getFileInfo: wx.getFileInfo,
-  getImageInfo: wx.getImageInfo,
-}, {
-  appId: 'wx005fb57931f363b0', // 小程序应用标识
-  spaceId: 'mp-1dca94ec-a727-4ec3-85a5-fe2b9e4cbdcd', // 服务空间标识
-  clientSecret: 'dtm04jkG302vz54XGXV5zQ==', // 服务空间 secret key
-  endpoint: 'https://api.next.bspapp.com', // 服务空间地址，从小程序 serverless 控制台处获得
-});
 
+// 微信云开发。env 换成你在云开发控制台建的环境 ID
+const CLOUD_ENV = 'cloud1-d3g2jsmt2f7b64682';
 
 App({
   onLaunch: async function () {
@@ -22,15 +11,17 @@ App({
       menus: ['shareAppMessage', 'shareTimeline'],
     });
 
-    // 页面不会等 onLaunch 结束才加载，把授权的 promise 挂到全局，
-    // 需要发请求的地方先等它，否则云函数拿不到调用者身份
-    this.authReady = mpServerless.user.authorize({
-      authProvider: 'wechat_openapi',
-    }).catch(err => {
-      console.error('mpserverless 授权失败', err);
-    });
+    if (!wx.cloud) {
+      console.error('当前基础库不支持云开发，请在开发者工具里把基础库调到 2.2.3 以上');
+      return;
+    }
 
-    await this.authReady;
+    // 云开发不需要显式登录：callFunction 自带调用者的 OPENID，
+    // 云函数里用 cloud.getWXContext() 就能拿到，页面直接发请求即可
+    wx.cloud.init({
+      env: CLOUD_ENV,
+      traceUser: true,
+    });
   },
 
   // 检查并应用小程序版本更新
@@ -66,7 +57,4 @@ App({
       })
     })
   },
-
-  mpServerless
-
 })

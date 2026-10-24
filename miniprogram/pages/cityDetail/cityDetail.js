@@ -1,5 +1,3 @@
-const app = getApp();
-
 import {
   normalizeCity,
   avatarUrl,
@@ -8,6 +6,7 @@ import {
   coverNameUrl,
   fallbackCoverUrl,
 } from '../../utils/city';
+import { fetchCityById } from '../../utils/db';
 
 // 地图卡片的最小可视跨度（公里）：标记点少时也要留出城市尺度的视野，
 // 否则 includePoints 会把镜头怼到最大级别，只剩一个图钉看不出是哪
@@ -33,7 +32,7 @@ Page({
   /**
    * 生命周期函数--监听页面加载
    */
-  onLoad: function (options) {
+  async onLoad(options) {
     const cityId = options.city_id;
     if (!cityId) {
       this.setData({
@@ -43,68 +42,70 @@ Page({
       return;
     }
 
-    app.mpServerless.db.collection('city').find({
-      _id: cityId,
-    }, {}).then(res => {
-      const city = normalizeCity(res.result && res.result[0]);
-      if (!city) {
-        this.setData({
-          loading: false,
-          error: '没有找到该城市',
-        });
-        return;
-      }
-
-      const markers = city.locations.map((point, index) => {
-        return {
-          iconPath: avatarUrl(city.name),
-          latitude: point.lat,
-          longitude: point.lng,
-          width: 50,
-          height: 50,
-          id: index,
-          name: point.name || city.name,
-          callout: {
-            content: point.name || city.name,
-            color: '#2C2C2A',
-            fontSize: 12,
-            bgColor: '#FFFFFF',
-            padding: 8,
-            borderRadius: 8,
-            display: 'BYCLICK',
-            textAlign: 'center',
-          },
-        };
-      });
-      const photos = city.photos.map(item => {
-        return {
-          preview: previewUrl(city.name, item.file),
-          original: originalUrl(city.name, item.file),
-          legend: [item.title, item.date].filter(Boolean).join(' · '),
-        };
-      });
-
-      this.setData({
-        loading: false,
-        city: city,
-        markers: markers,
-        photos: photos,
-        previewUrls: [coverNameUrl(city.name, true)].concat(
-          photos.map(item => item.original)
-        ),
-        cover: coverNameUrl(city.name, false),
-        coverOriginal: coverNameUrl(city.name, true),
-        subtitle: buildSubtitle(city),
-        stats: buildStats(city),
-      }, () => {
-        this.includePointsOne(false);
-      });
-    }).catch(err => {
+    let city;
+    try {
+      const list = await fetchCityById(cityId);
+      city = normalizeCity(list[0]);
+    } catch (err) {
       console.error(err);
       this.setData({
         loading: false,
         error: '加载失败，请稍后再试',
       });
+      return;
+    }
+
+    if (!city) {
+      this.setData({
+        loading: false,
+        error: '没有找到该城市',
+      });
+      return;
+    }
+
+    const markers = city.locations.map((point, index) => {
+      return {
+        iconPath: avatarUrl(city.name),
+        latitude: point.lat,
+        longitude: point.lng,
+        width: 50,
+        height: 50,
+        id: index,
+        name: point.name || city.name,
+        callout: {
+          content: point.name || city.name,
+          color: '#2C2C2A',
+          fontSize: 12,
+          bgColor: '#FFFFFF',
+          padding: 8,
+          borderRadius: 8,
+          display: 'BYCLICK',
+          textAlign: 'center',
+        },
+      };
+    });
+    const photos = city.photos.map(item => {
+      return {
+        preview: previewUrl(city.name, item.file),
+        original: originalUrl(city.name, item.file),
+        legend: [item.title, item.date].filter(Boolean).join(' · '),
+      };
+    });
+
+    this.setData({
+      loading: false,
+      city: city,
+      markers: markers,
+      photos: photos,
+      previewUrls: [coverNameUrl(city.name, true)].concat(
+        photos.map(item => item.original)
+      ),
+      cover: coverNameUrl(city.name, false),
+      coverOriginal: coverNameUrl(city.name, true),
+      subtitle: buildSubtitle(city),
+      stats: buildStats(city),
+    }, () => {
+      this.includePointsOne(false);
     });
   },
 
