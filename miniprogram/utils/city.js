@@ -196,8 +196,9 @@ const OTHER_SPOT = '其他照片';
 // 规则：
 //   1. 只认 spot 字段，不靠 title 或文件名猜（同名不同景点、景点名改了都会出错）
 //   2. 组的顺序 = 该 spot 第一次出现的顺序，不去重也不重排
-//   3. 没填 spot 的全部塞进末尾一组；整座城市都没填时，这一组不带标题
-//   4. 组里最后一张如果是单数（落单半格），让它占满整行，避免右侧空一块
+//   3. 没填 spot 的全部归入末尾一组；整座城市都没填时，这一组不带标题
+//   4. 没填 spot 的照片彼此没有关联，各占满整行按原图比例显示
+//   5. 填了 spot 的组走两列网格，组内最后一张落单时占满整行，避免右侧空半格
 //
 // 产出的是视图层直接能渲染的结构（含图片地址），页面不用再拼 URL。
 export function groupPhotos(city) {
@@ -225,10 +226,16 @@ export function groupPhotos(city) {
     group.items.push(item);
   });
 
-  const groups = named.slice();
+  const groups = named.map(group => ({
+    name: group.name,
+    named: true,
+    items: group.items,
+  }));
+
   if (others.length) {
     groups.push({
       name: named.length ? OTHER_SPOT : '',
+      named: false,
       items: others,
     });
   }
@@ -238,9 +245,11 @@ export function groupPhotos(city) {
     name: group.name,
     count: group.items.length,
     subtitle: buildSpotMeta(group.items),
+    // wide 决定 photo 是否占满整行并按原图比例显示：
+    // 没填 spot 的每张都是；填了的组只在最后一张落单时才让它占满
     photos: group.items.map((item, index) => ({
-      // 组内最后一张落单时占满整行；只有一张也算落单
-      wide: index === group.items.length - 1 && (group.items.length % 2 === 1),
+      wide: !group.named ||
+        (index === group.items.length - 1 && group.items.length % 2 === 1),
       key: (group.name || 'photo') + '-' + index,
       preview: previewUrl(cityName, item.file),
       original: originalUrl(cityName, item.file),
