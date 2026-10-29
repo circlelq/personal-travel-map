@@ -74,6 +74,7 @@ Page({
       // 让人知道这张图对应 COS 上的哪一个文件
       title: item.title,
       date: item.date,
+      spot: item.spot,
     }));
 
     this.setData({
@@ -89,6 +90,29 @@ Page({
     });
 
     this._snapshot = serialize(photos);
+  },
+
+  // 同一个景点的照片一般是连续录入的，所以填这一行时把后面还空着的行一起带上，
+  // 已经填过的行不动。只在有值时才向后填，清空不会带倒一整串
+  onSpotInput(e) {
+    const index = Number(e.currentTarget.dataset.index);
+    const photos = this.data.photos;
+    if (!photos[index]) return;
+
+    const value = e.detail.value;
+    const patch = {
+      ['photos[' + index + '].spot']: value,
+    };
+
+    if (value.trim()) {
+      for (let i = index + 1; i < photos.length; i++) {
+        if (!photos[i].spot) patch['photos[' + i + '].spot'] = value;
+      }
+    }
+
+    this.setData(patch, () => {
+      this.syncDirty();
+    });
   },
 
   onTitleInput(e) {
@@ -220,6 +244,7 @@ Page({
       const photo = {
         file: item.file,
       };
+      if (item.spot) photo.spot = item.spot;
       if (item.title) photo.title = item.title;
       if (item.date) photo.date = item.date;
       return photo;
@@ -239,6 +264,7 @@ Page({
 // 只比较会被保存的字段，视图层的预览图地址之类不参与
 function serialize(photos) {
   return JSON.stringify((photos || []).map(item => ({
+    spot: item.spot || '',
     title: item.title || '',
     date: item.date || '',
   })));

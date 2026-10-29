@@ -53,6 +53,9 @@ export function normalizeCity(raw) {
       file: item.file,
       title: item.title || '',
       date: parseDate(item.date),
+      // spot 是可选的景点名，用来在详情页把同一个地方的照片放到一组；
+      // 没填就归入「其他照片」，老数据不用改也能跑
+      spot: item.spot ? String(item.spot).trim() : '',
     }));
 
   // 到访日期：新格式是 visits 数组，旧格式藏在 pinyin 里
@@ -178,4 +181,92 @@ export function coverUrl(city) {
 export function fallbackCoverUrl(city) {
   const first = (city.photos || [])[0];
   return first ? previewUrl(city.name, first.file) : avatarUrl(city.name);
+}
+
+// ---------------------------------------------------------------------------
+// 照片分组
+// ---------------------------------------------------------------------------
+
+// 没有填 spot 的照片统一归入末尾一组，只有存在其他分组时才给它一个标题，
+// 否则整座城市都没有分组信息时不显示标题条，直接铺开
+const OTHER_SPOT = '其他照片';
+
+// 把城市的照片按 spot 分成若干组，组内保持原始顺序。
+//
+// 规则：
+//   1. 只认 spot 字段，不靠 title 或文件名猜（同名不同景点、景点名改了都会出错）
+//   2. 组的顺序 = 该 spot 第一次出现的顺序，不去重也不重排
+//   3. 没填 spot 的全部塞进末尾一组；整座城市都没填时，这一组不带标题
+//   4. 组里最后一张如果是单数（落单半格），让它占满整行，避免右侧空一块
+//
+// 产出的是视图层直接能渲染的结构（含图片地址），页面不用再拼 URL。
+export function groupPhotos(city) {
+  const photos = (city && city.photos) || [];
+  if (!photos.length) return [];
+
+  const cityName = city.name || '';
+  const named = [];
+  const namedIndex = new Map();
+  const others = [];
+
+  photos.forEach(item => {
+    const spot = item.spot || '';
+    if (!spot) {
+      others.push(item);
+      return;
+    }
+
+    let group = namedIndex.get(spot);
+    if (!group) {
+      group = { name: spot, items: [] };
+      namedIndex.set(spot, group);
+      named.push(group);
+    }
+    group.items.push(item);
+  });
+
+  const groups = named.slice();
+  if (others.length) {
+    groups.push({
+      name: named.length ? OTHER_SPOT : '',
+      items: others,
+    });
+  }
+
+  return groups.map(group => ({
+    key: group.name || '__all__',
+    name: group.name,
+    count: group.items.length,
+    subtitle: buildSpotMeta(group.items),
+    photos: group.items.map((item, index) => ({
+      // 组内最后一张落单时占满整行；只有一张也算落单
+      wide: index === group.items.length - 1 && (group.items.length % 2 === 1),
+      key: (group.name || 'photo') + '-' + index,
+      preview: previewUrl(cityName, item.file),
+      original: originalUrl(cityName, item.file),
+      legend: [item.title, item.date].filter(Boolean).join(' · '),
+    })),
+  }));
+}
+
+// 组标题右侧的说明：张数 + 日期。日期不一致时显示到月为止的区间
+function buildSpotMeta(items) {
+  const parts = [items.length + ' 张'];
+
+  const dates = items.map(item => item.date).filter(Boolean).sort();
+  if (dates.length) {
+    const first = dates[0];
+    const last = dates[dates.length - 1];
+
+    if (first === last) {
+      parts.push(first);
+    } else if (first.slice(0, 7) === last.slice(0, 7)) {
+      // 同一个月内，省略重复的年月，只补后一个日号
+      parts.push(first + ' ~ ' + last.slice(8));
+    } else {
+      parts.push(first.slice(0, 7) + ' ~ ' + last.slice(0, 7));
+    }
+  }
+
+  return parts.join(' · ');
 }

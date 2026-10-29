@@ -36,19 +36,34 @@
     </view>
   </view>
 
-  <!-- 照片 -->
+  <!-- 照片：先按景点分组，组内两列网格铺开 -->
   <view class="section" wx:if="{{photos.length}}">
     <view class="section-title">照片</view>
-    <view class="photo" wx:for="{{photos}}" wx:key="preview">
-      <image
-        class="photo-img"
-        src="{{item.preview}}"
-        mode="widthFix"
-        lazy-load="true"
-        bindtap="previewImage"
-        data-src="{{item.original}}"
-      ></image>
-      <view class="legend" wx:if="{{item.legend}}">{{item.legend}}</view>
+
+    <view class="spot" wx:for="{{groups}}" wx:key="key">
+      <view class="spot-head" wx:if="{{item.name}}">
+        <view class="spot-name">{{item.name}}</view>
+        <view class="spot-meta">{{item.subtitle}}</view>
+      </view>
+
+      <view class="grid">
+        <view
+          class="cell {{photo.wide ? 'cell-wide' : ''}}"
+          wx:for="{{item.photos}}"
+          wx:for-item="photo"
+          wx:key="key"
+        >
+          <image
+            class="cell-img"
+            src="{{photo.preview}}"
+            mode="{{photo.wide ? 'widthFix' : 'aspectFill'}}"
+            lazy-load="true"
+            bindtap="previewImage"
+            data-src="{{photo.original}}"
+          ></image>
+          <view class="cell-legend" wx:if="{{photo.legend}}">{{photo.legend}}</view>
+        </view>
+      </view>
     </view>
   </view>
 

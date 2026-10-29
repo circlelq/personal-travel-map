@@ -109,24 +109,71 @@ page {
   color: var(--text-primary);
 }
 
-/* 照片 */
-.photo {
-  margin-bottom: 28rpx;
+/* 照片：按景点分组，组内两列网格 */
+.spot {
+  margin-bottom: 20rpx;
+}
+
+.spot-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0 8rpx 16rpx;
+}
+
+.spot-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.spot-meta {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  font-size: 22rpx;
+  color: var(--text-secondary);
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  /* 负边距抵掉格子左右的外边距，让首尾两格贴齐区块边界 */
+  margin: 0 -6rpx;
+}
+
+.cell {
+  width: calc(50% - 12rpx);
+  margin: 0 6rpx 12rpx;
   background: #fff;
   border-radius: 16rpx;
   overflow: hidden;
 }
 
-.photo-img {
-  display: block;
-  width: 100%;
+/* 组内最后一张落单时占满整行 */
+.cell-wide {
+  width: calc(100% - 12rpx);
 }
 
-.legend {
-  padding: 20rpx 24rpx 24rpx;
-  font-size: 26rpx;
-  line-height: 1.6;
+/* 半格用定高 + 裁切，保证两列始终对齐 */
+.cell-img {
+  display: block;
+  width: 100%;
+  height: 340rpx;
+}
+
+/* 整宽的走 widthFix，按原图比例显示，不裁切 */
+.cell-wide .cell-img {
+  height: auto;
+}
+
+.cell-legend {
+  padding: 14rpx 18rpx 16rpx;
+  font-size: 22rpx;
+  line-height: 1.5;
   color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* 地图 */

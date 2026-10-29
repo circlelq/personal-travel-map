@@ -1,8 +1,7 @@
 import {
   normalizeCity,
   avatarUrl,
-  previewUrl,
-  originalUrl,
+  groupPhotos,
   coverNameUrl,
   fallbackCoverUrl,
 } from '../../utils/city';
@@ -22,6 +21,7 @@ Page({
     city: {},
     markers: [],
     photos: [],
+    groups: [],
     previewUrls: [],
     cover: "",
     coverOriginal: "",
@@ -84,18 +84,19 @@ Page({
         },
       };
     });
-    const photos = city.photos.map(item => {
-      return {
-        preview: previewUrl(city.name, item.file),
-        original: originalUrl(city.name, item.file),
-        legend: [item.title, item.date].filter(Boolean).join(' · '),
-      };
+    // 按景点分组后再摊平成一维顺序：全屏预览左右滑的顺序与页面看到的一致，
+    // 同一景点不会被中途滑到别的地方去
+    const groups = groupPhotos(city);
+    const photos = [];
+    groups.forEach(group => {
+      group.photos.forEach(photo => photos.push(photo));
     });
 
     this.setData({
       loading: false,
       city: city,
       markers: markers,
+      groups: groups,
       photos: photos,
       previewUrls: [coverNameUrl(city.name, true)].concat(
         photos.map(item => item.original)

@@ -40,6 +40,7 @@ const EDIT_TOKEN = (process.env && process.env.EDIT_TOKEN) || '';
 const MAX_PHOTOS = 200;
 const MAX_FILE_LEN = 120;
 const MAX_TITLE_LEN = 30;
+const MAX_SPOT_LEN = 20;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const OBJECT_ID_RE = /^[a-fA-F0-9]{24}$/;
 
@@ -93,8 +94,12 @@ exports.main = async (event = {}, context = {}) => {
     return { success: false, code: 'BAD_REQUEST', message: invalid };
   }
 
+  // 整份 photos 会被替换，字段放行了才能在库里留下：
+  // spot 用来在详情页把同一个景点的照片分到一组
   const photos = event.photos.map(item => {
     const photo = { file: item.file };
+    const spot = typeof item.spot === 'string' ? item.spot.trim() : '';
+    if (spot) photo.spot = spot;
     if (item.title) photo.title = item.title;
     if (item.date) photo.date = item.date;
     return photo;
@@ -212,6 +217,11 @@ function validate(args) {
     }
     if (item.file.length > MAX_FILE_LEN) {
       return 'file 过长';
+    }
+    if (item.spot != null && item.spot !== '') {
+      if (typeof item.spot !== 'string' || item.spot.trim().length > MAX_SPOT_LEN) {
+        return 'spot 不合法';
+      }
     }
     if (item.title != null) {
       if (typeof item.title !== 'string' || item.title.length > MAX_TITLE_LEN) {

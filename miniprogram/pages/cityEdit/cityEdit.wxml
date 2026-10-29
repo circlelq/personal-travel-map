@@ -7,7 +7,10 @@
     </view>
   </view>
 
-  <view class="tip">名称或日期留空时，详情页不会显示该项</view>
+  <view class="tip">
+    景点相同的照片会在详情页放到一组；留空归入「其他照片」。
+    填第一行景点时，后面还没填的会自动跟着填。
+  </view>
 
   <view class="section" wx:if="{{photos.length}}">
     <view class="section-title">照片信息</view>
@@ -22,6 +25,20 @@
       ></image>
 
       <view class="photo-main">
+        <view class="field">
+          <text class="field-label">景点</text>
+          <input
+            class="field-input"
+            value="{{item.spot}}"
+            placeholder="分组用，可不填"
+            placeholder-class="field-placeholder"
+            maxlength="20"
+            adjust-position="true"
+            data-index="{{index}}"
+            bindinput="onSpotInput"
+          ></input>
+        </view>
+
         <view class="field">
           <text class="field-label">名称</text>
           <input
