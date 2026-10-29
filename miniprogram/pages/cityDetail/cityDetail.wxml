@@ -53,15 +53,17 @@
           wx:for-item="photo"
           wx:key="key"
         >
-          <image
-            class="cell-img"
-            src="{{photo.preview}}"
-            mode="{{photo.wide ? 'widthFix' : 'aspectFill'}}"
-            lazy-load="true"
-            bindtap="previewImage"
-            data-src="{{photo.original}}"
-          ></image>
-          <view class="cell-legend" wx:if="{{photo.legend}}">{{photo.legend}}</view>
+          <view class="card">
+            <image
+              class="cell-img"
+              src="{{photo.preview}}"
+              mode="{{photo.wide ? 'widthFix' : 'aspectFill'}}"
+              lazy-load="true"
+              bindtap="previewImage"
+              data-src="{{photo.original}}"
+            ></image>
+            <view class="cell-legend" wx:if="{{photo.legend}}">{{photo.legend}}</view>
+          </view>
         </view>
       </view>
     </view>

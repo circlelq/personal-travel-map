@@ -141,17 +141,23 @@ page {
   margin: 0 -6rpx;
 }
 
+/* 格子只负责占一半宽度（纯百分比），间距交给内层 card 的外边距。
+   不要写成 calc(50% - 12rpx)：百分号和 rpx 混算在部分渲染内核里会失效，
+   宽度一旦失效格子就退回整行，两列的效果整个没了 */
 .cell {
-  width: calc(50% - 12rpx);
-  margin: 0 6rpx 12rpx;
-  background: #fff;
-  border-radius: 16rpx;
-  overflow: hidden;
+  width: 50%;
 }
 
 /* 组内最后一张落单时占满整行 */
 .cell-wide {
-  width: calc(100% - 12rpx);
+  width: 100%;
+}
+
+.card {
+  margin: 0 6rpx 12rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
 }
 
 /* 半格用定高 + 裁切，保证两列始终对齐 */
