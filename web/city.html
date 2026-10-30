@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>城市 · 旅行地图</title>
+<link rel="stylesheet" href="./assets/style.css">
+</head>
+<body>
+  <div class="page">
+    <div id="root">
+      <div class="state">加载中…</div>
+    </div>
+  </div>
+
+  <div class="lightbox" id="lightbox" hidden>
+    <button class="lightbox-close" id="lightbox-close" type="button">关闭</button>
+    <img class="lightbox-img" id="lightbox-img" alt="">
+    <div class="lightbox-counter" id="lightbox-counter"></div>
+  </div>
+
+  <!-- 云开发 Web SDK，随页面一起部署的本地打包版，不走第三方 CDN -->
+  <script src="./assets/cloudbase.iife.js"></script>
+  <script type="module" src="./assets/detail.js"></script>
+</body>
+</html>

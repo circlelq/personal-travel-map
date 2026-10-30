@@ -44,6 +44,7 @@ template.json          新增城市的字段模板
 scripts/
 ├── emas-to-cloudbase.js   EMAS 数据转成云开发能导入的 JSON Lines
 └── migrate-city.js        旧格式数据迁移到新格式
+web/                       网页版，与小程序共用 city 集合，详见 web/README.md
 changeLog.md               版本记录
 ```
 

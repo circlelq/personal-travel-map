@@ -1,0 +1,341 @@
+/* 与小程序 app.wxss 的设计变量保持一致：主色 #557e56、文字 #2c2c2a / #8a8a8a */
+:root {
+  --brand: #557e56;
+  --text-primary: #2c2c2a;
+  --text-secondary: #8a8a8a;
+  --page-bg: #f7f8f7;
+  --card-radius: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--page-bg);
+  color: var(--text-primary);
+  font: 400 15px/1.6 -apple-system, BlinkMacSystemFont, "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 16px 48px;
+}
+
+.site-head {
+  margin-bottom: 20px;
+}
+
+.site-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.site-sub {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* 瀑布流用 CSS 多列：高度由图片自身比例决定，两列自动错落。
+   break-inside 防止卡片被拆到两列中间 */
+.waterfall {
+  column-count: 2;
+  column-gap: 12px;
+  margin-top: 20px;
+}
+
+@media (min-width: 700px) {
+  .waterfall {
+    column-count: 3;
+  }
+}
+
+@media (min-width: 1000px) {
+  .waterfall {
+    column-count: 4;
+  }
+}
+
+.card {
+  break-inside: avoid;
+  margin-bottom: 12px;
+  background: #fff;
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.card:hover {
+  opacity: 0.86;
+}
+
+.card-cover {
+  width: 100%;
+  height: auto;
+  background: #eceeeb;
+}
+
+.card-body {
+  padding: 10px 12px 12px;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.card-meta {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* 加载中 / 失败 / 空状态 */
+.state {
+  padding: 80px 0;
+  text-align: center;
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.state-hint {
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.state-hint code {
+  padding: 2px 6px;
+  background: #fff;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+/* ------------------------------------------------------------------ */
+/* 详情页                                                              */
+/* ------------------------------------------------------------------ */
+
+.back {
+  display: inline-block;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--brand);
+}
+
+.detail {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 0 48px;
+}
+
+.hero {
+  background: #fff;
+}
+
+.hero-cover {
+  width: 100%;
+  height: auto;
+  background: #eceeeb;
+}
+
+.hero-body {
+  padding: 20px 20px 18px;
+}
+
+.hero-name {
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.hero-sub {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  margin: 12px 16px;
+  padding: 18px 0;
+  background: #fff;
+  border-radius: var(--card-radius);
+}
+
+.stat {
+  flex: 1;
+  text-align: center;
+}
+
+.stat:not(:last-child) {
+  border-right: 1px solid #f0f0f0;
+}
+
+.stat-num {
+  display: block;
+  font-size: 26px;
+  font-weight: 500;
+  color: var(--brand);
+  line-height: 1.2;
+}
+
+.stat-label {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.section {
+  margin: 0 16px 18px;
+}
+
+.section-title {
+  margin: 6px 4px 12px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.spot {
+  margin-bottom: 14px;
+}
+
+.spot-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0 4px 10px;
+}
+
+.spot-name {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.spot-meta {
+  flex-shrink: 0;
+  margin-left: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* 格子只声明纯百分比宽度，间距交给内层 tile 的外边距。
+   不要写成 calc(50% - 12px)：万一失效格子就退回整行，两列效果整个没了 */
+.cell {
+  width: 50%;
+}
+
+.cell-wide {
+  width: 100%;
+}
+
+.tile {
+  margin: 0 3px 8px;
+  background: #fff;
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  cursor: zoom-in;
+}
+
+.cell-img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  background: #eceeeb;
+}
+
+.cell-wide .cell-img {
+  height: auto;
+  object-fit: fill;
+}
+
+.cell-legend {
+  padding: 8px 12px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 13px;
+  color: #c8c8c8;
+}
+
+/* 全屏看图 */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.92);
+}
+
+.lightbox[hidden] {
+  display: none;
+}
+
+.lightbox-img {
+  max-width: 96vw;
+  max-height: 92vh;
+  object-fit: contain;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  padding: 8px 14px;
+  color: #fff;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.14);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.lightbox-counter {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+}
