@@ -62,7 +62,10 @@ export async function fetchAllCities() {
 export async function fetchCityById(id) {
   const db = await collection();
   const res = await db.doc(id).get();
-  return normalizeCity(res && res.data);
+  // Web SDK 的 doc().get() 返回 { data: [文档] }（数组包一层），
+  // 和小程序 SDK 直接返回对象不一样，这里统一拆开
+  const raw = res && Array.isArray(res.data) ? res.data[0] : res && res.data;
+  return normalizeCity(raw);
 }
 
 // 把 SDK 的报错翻成人话。最常见的两类是忘记开匿名登录和忘记加安全域名
